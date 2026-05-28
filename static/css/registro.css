@@ -1,0 +1,247 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+* { 
+    -webkit-box-sizing:border-box; 
+    -moz-box-sizing:border-box; 
+    -ms-box-sizing:border-box; 
+    -o-box-sizing:border-box; 
+    box-sizing:border-box; 
+}
+
+html { 
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+}
+
+body { 
+    width: 100%;
+    min-height: 100vh;
+    font-family: 'Roboto', sans-serif;
+    background: #092756;
+    background: radial-gradient(ellipse at 0% 100%, rgba(104,128,138,.4) 10%, rgba(138,114,76,0) 40%), 
+                linear-gradient(to bottom, #092756 0%, #0166ff 100%), 
+                linear-gradient(135deg, #092756 0%, #0166ff 100%);
+    background-attachment: fixed;
+    background-size: cover;
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+.registro-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.logo-registro {
+    width: 250px;
+    height: auto;
+    display: block;
+    margin: 0 auto 20px;
+}
+
+.registro-container h2 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 24px;
+    text-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"] {
+    width: 100%;
+    padding: 12px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(0,0,0,0.3);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    box-shadow: inset 0 -5px 45px rgba(100,100,100,0.2), 0 1px 1px rgba(255,255,255,0.2);
+    transition: box-shadow .5s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus {
+    box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgba(255,255,255,0.2);
+}
+
+input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.password-hint {
+    display: block;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.error-message {
+    display: block;
+    color: #ff6b6b;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.btn-registro {
+    width: 100%;
+    height: 45px;
+    background: white;
+    border: 2px solid #fcfafa;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    color: #666565;
+    margin-top: 10px;
+}
+
+.btn-registro:hover {
+    background: #58c13d;
+    border-color: #10b981;
+    color: white;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.login-link a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.login-link a:hover {
+    color: #58c13d;
+}
+
+.mensaje-exito {
+    text-align: center;
+    color: #fff;
+    padding: 20px;
+}
+
+.mensaje-exito h2 {
+    color: #58c13d;
+    margin-bottom: 15px;
+}
+
+.mensaje-exito p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.btn-volver {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 30px;
+    background: white;
+    color: #666565;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.btn-volver:hover {
+    background: #58c13d;
+    color: white;
+}
+
+#footer {
+    text-align: center;
+    font-size: 10px;
+    color: white;
+    padding: 20px;
+    margin-top: 30px;
+    position: relative;
+    width: 100%;
+}
+
+/* RESPONSIVE: Ajustes para pantallas pequeñas */
+@media (max-width: 768px) {
+    .registro-container {
+        max-width: 90%;
+        margin: 30px auto;
+        padding: 20px;
+    }
+    
+    .logo-registro {
+        width: 200px;
+    }
+}
+
+@media (max-width: 576px) {
+    .registro-container {
+        max-width: 95%;
+        margin: 20px auto;
+        padding: 20px 15px;
+    }
+    
+    .logo-registro {
+        width: 180px;
+        margin-bottom: 15px;
+    }
+    
+    .registro-container h2 {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+    
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"] {
+        padding: 10px;
+        font-size: 13px;
+    }
+    
+    .form-group {
+        margin-bottom: 12px;
+    }
+    
+    .btn-registro {
+        height: 40px;
+        font-size: 13px;
+    }
+    
+    .password-hint {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 400px) {
+    /* Para pantallas muy pequeñas */
+    .registro-container {
+        max-width: 98%;
+        margin: 15px auto;
+        padding: 15px 10px;
+    }
+    
+    .logo-registro {
+        width: 150px;
+    }
+    
+    .registro-container h2 {
+        font-size: 18px;
+    }
+}

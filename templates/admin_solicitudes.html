@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/logo_ico.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_solicitudes.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template_submenu.css') }}">
+    <title>smartsoc | Administrar Solicitudes</title>
+</head>
+<body>
+    <div class="menu">
+        <ion-icon name="menu-outline"></ion-icon>
+        <ion-icon name="close-outline"></ion-icon>
+    </div>
+    
+    <div class="barra-lateral">
+        <div>
+            <div class="nombre-pagina">
+                <img id="icon-logo" class="ico-logo" src="{{ url_for('static', filename='img/logo.png') }}"/>
+                <img class="logo" src="{{ url_for('static', filename='img/nombre_logo.png') }}" />    
+            </div>
+            <div class="linea"></div>
+            <br>
+        </div>
+        
+        <nav class="navegacion">
+            <ul>
+                {% if menu_permisos.home %}
+                <li>
+                    <a id="home" href="{{ url_for('home') }}">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span>Home</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.callcenter %}
+                <li>
+                    <a href="{{ url_for('consultar_callcenter') }}">
+                        <ion-icon name="people-outline"></ion-icon>
+                        <span>Callcenter</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.callcenter_abonados %}
+                <li>
+                    <a id="callcenter_abonados" href="{{ url_for('callcenter_abonados') }}">
+                        <ion-icon name="accessibility-outline"></ion-icon>
+                        <span>Abonados</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.n1 %}
+                <li>
+                    <a id="n1_active" href="{{ url_for('n1') }}">
+                        <ion-icon name="speedometer-outline"></ion-icon>
+                        <span>Monitoreo N1</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.trabajos_programados %}
+                <li>
+                    <a id="trabajos_programados" href="{{ url_for('route_trabajos_programados') }}">
+                        <ion-icon name="calendar-outline"></ion-icon>
+                        <span>Trabajos Programados</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- DASHBOARDS CON SUBMENÚ -->
+                {% if menu_permisos.dashboard %}
+                <li class="has-submenu">
+                    <a href="{{ url_for('dashboard') }}">
+                        <ion-icon name="bar-chart-outline"></ion-icon>
+                        <span>Dashboards</span>
+                    </a>
+                    
+                    <!-- SUBMENÚ DE DASHBOARDS -->
+                    <ul class="submenu">
+                        <!-- Estado Red Fija -->
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_fija') }}">
+                                <ion-icon name="home-outline"></ion-icon>
+                                <span>Estado Red Fija</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <!-- Estado Red Móvil -->
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_movil') }}">
+                                <ion-icon name="phone-portrait-outline"></ion-icon>
+                                <span>Estado Red Móvil</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <!-- RED BACKHAUL CON SUBMENÚ ANIDADO -->
+                        {% if menu_permisos.dashboard %}
+                        <li class="has-submenu">
+                            <a href="{{ url_for('dash_backhaul') }}">
+                                <ion-icon name="git-network-outline"></ion-icon>
+                                <span>Red Backhaul</span>
+                            </a>
+                            
+                            <!-- SUBMENÚ ANIDADO DE BACKHAUL -->
+                            <ul class="submenu">
+                                <!-- Monitoreo HL5 -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('monitoreo_hl5') }}">
+                                        <ion-icon name="desktop-outline"></ion-icon>
+                                        <span>Monitoreo HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                <!-- Seguimiento HL5 -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('seguimiento_hl5') }}">
+                                        <ion-icon name="search-outline"></ion-icon>
+                                        <span>Seguimiento HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                <!-- Aperturas de Anillos -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('aperturas_anillos') }}">
+                                        <ion-icon name="git-branch-outline"></ion-icon>
+                                        <span>Anillos y Cabeceras</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.servicio_al_cliente %}
+                <li>
+                    <a id="servicio_al_cliente" href="{{ url_for('servicio_al_cliente') }}">
+                        <ion-icon name="globe-outline"></ion-icon>
+                        <span>Mapa en Vivo</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Gobernanza - Solo para CG -->
+                {% if menu_permisos.gobernanza %}
+                <li>
+                    <a href="{{ url_for('gobernanza') }}">
+                        <ion-icon name="shield-checkmark-outline"></ion-icon>
+                        <span>Gobernanza</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.admin_solicitudes %}
+                <li>
+                    <a href="{{ url_for('admin_solicitudes') }}">
+                        <ion-icon name="person-add-outline"></ion-icon>
+                        <span>Solicitudes</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Gestión de Usuarios - Solo para ADMIN -->
+                {% if menu_permisos.gestion_usuarios %}
+                <li>
+                    <a href="{{ url_for('gestion_usuarios') }}">
+                        <ion-icon name="people-circle-outline"></ion-icon>
+                        <span>Gestión de Usuarios</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        
+        <!-- ⭐ USUARIO CON BADGE DE PERFIL -->
+        <div>
+            <div class="linea"></div>
+            <div class="usuario">
+                <img src="{{ url_for('static', filename='img/ico_person-circle-outline_blue.svg') }}" alt="" class="img_user">
+                <div class="info-usuario">
+                    <div class="usuario_red">
+                        <span class="usuario_name">{{ session['USUARIO'] }}</span>
+                        {% if perfil_usuario %}
+                        <small style="font-size: 10px; color: #666; margin-top: 2px; display: block;">{{ perfil_usuario }}</small>
+                        {% endif %}
+                    </div>
+                    <form action="{{ url_for('logout') }}" method="post">
+                        <button id="logoutBtn" class="logout-btn">
+                            <ion-icon name="log-out-outline"></ion-icon>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <main>
+        <h1>Administración de Solicitudes de Usuario</h1>
+        <br>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Filtros -->
+        <div class="filtros-container">
+            <div class="filtro-item">
+                <label>Filtrar por estado:</label>
+                <select id="filtroEstado" onchange="filtrarSolicitudes()">
+                    <option value="todos">Todos</option>
+                    <option value="PENDIENTE" selected>Pendientes</option>
+                    <option value="APROBADO">Aprobadas</option>
+                    <option value="RECHAZADO">Rechazadas</option>
+                </select>
+            </div>
+            <div class="contador-solicitudes">
+                <span><b>Total Solicitudes:</b> {{ solicitudes|length }}</span>
+                <span><b>Pendientes:</b> <span class="badge-pendiente">{{ solicitudes_pendientes }}</span></span>
+            </div>
+        </div>
+
+        <div class="tabla-container">
+            {% if solicitudes %}
+            <table class="tabla-solicitudes">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha Solicitud</th>
+                        <th>Nombre Completo</th>
+                        <th>Correo</th>
+                        <th>Área</th>
+                        <th>Usuario Red</th>
+                        <th>Teléfono</th>
+                        <th>Estado</th>
+                        <th>Perfil</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for solicitud in solicitudes %}
+                    <tr class="fila-solicitud" data-estado="{{ solicitud[8] }}">
+                        <td>{{ solicitud[0] }}</td>
+                        <td>{{ solicitud[1].strftime('%d/%m/%Y %H:%M') if solicitud[1] else 'N/A' }}</td>
+                        <td>{{ solicitud[2] }} {{ solicitud[3] }}</td>
+                        <td>{{ solicitud[4] }}</td>
+                        <td>{{ solicitud[5] }}</td>
+                        <td>{{ solicitud[6] }}</td>
+                        <td>{{ solicitud[7] }}</td>
+                        <td>
+                            <span class="badge badge-{{ solicitud[8].lower() }}">
+                                {{ solicitud[8] }}
+                            </span>
+                        </td>
+                        <td>{{ solicitud[9] if solicitud[9] else '-' }}</td>
+                        <td>
+                            {% if solicitud[8] == 'PENDIENTE' %}
+                            <button class="btn-accion btn-aprobar" onclick="mostrarModalAprobar({{ solicitud[0] }}, '{{ solicitud[2] }}', '{{ solicitud[3] }}', '{{ solicitud[4] }}')">
+                                <ion-icon name="checkmark-circle-outline"></ion-icon> Aprobar
+                            </button>
+                            <button class="btn-accion btn-rechazar" onclick="mostrarModalRechazar({{ solicitud[0] }}, '{{ solicitud[2] }}', '{{ solicitud[3] }}')">
+                                <ion-icon name="close-circle-outline"></ion-icon> Rechazar
+                            </button>
+                            {% else %}
+                            <button class="btn-accion btn-ver" onclick="verDetalle({{ solicitud[0] }})">
+                                <ion-icon name="eye-outline"></ion-icon> Ver
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="no-solicitudes">
+                <ion-icon name="folder-open-outline"></ion-icon>
+                <p>No hay solicitudes registradas</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- Modal Aprobar -->
+    <div id="modalAprobar" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal('modalAprobar')">&times;</span>
+            <h2>Aprobar Solicitud</h2>
+            <form id="formAprobar" method="post" action="{{ url_for('procesar_solicitud') }}">
+                <input type="hidden" name="id_solicitud" id="aprobar_id">
+                <input type="hidden" name="accion" value="aprobar">
+                
+                <div class="modal-info">
+                    <p><strong>Usuario:</strong> <span id="aprobar_nombre"></span></p>
+                    <p><strong>Correo:</strong> <span id="aprobar_correo"></span></p>
+                </div>
+                
+                <div class="form-group-modal">
+                    <label for="perfil">Asignar Perfil: *</label>
+                    <select name="perfil" id="perfil" required>
+                        <option value="">Seleccione un perfil</option>
+                        <option value="CG">CG</option>
+                        <option value="Callcenter">Callcenter</option> 
+                        <option value="Servicio al Cliente">Servicio al Cliente</option>
+                        <option value="Dashboards - Servicio al Cliente">Dashboards - Servicio al Cliente</option>
+                        <option value="Dashboards">Dashboards</option>
+                        <option value="Externos">Externos</option>
+                    </select>
+                </div>
+                
+                <div class="form-group-modal">
+                    <label for="observaciones">Observaciones (opcional):</label>
+                    <textarea name="observaciones" id="observaciones" rows="3" placeholder="Comentarios adicionales..."></textarea>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-modal btn-confirmar">
+                        <ion-icon name="checkmark-circle"></ion-icon> Confirmar Aprobación
+                    </button>
+                    <button type="button" class="btn-modal btn-cancelar" onclick="cerrarModal('modalAprobar')">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Rechazar -->
+    <div id="modalRechazar" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal('modalRechazar')">&times;</span>
+            <h2>Rechazar Solicitud</h2>
+            <form id="formRechazar" method="post" action="{{ url_for('procesar_solicitud') }}">
+                <input type="hidden" name="id_solicitud" id="rechazar_id">
+                <input type="hidden" name="accion" value="rechazar">
+                
+                <div class="modal-info">
+                    <p><strong>Usuario:</strong> <span id="rechazar_nombre"></span></p>
+                </div>
+                
+                <div class="form-group-modal">
+                    <label for="motivo_rechazo">Motivo del Rechazo: *</label>
+                    <textarea name="motivo_rechazo" id="motivo_rechazo" rows="4" placeholder="Especifique el motivo del rechazo..." required></textarea>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-modal btn-rechazar-confirmar">
+                        <ion-icon name="close-circle"></ion-icon> Confirmar Rechazo
+                    </button>
+                    <button type="button" class="btn-modal btn-cancelar" onclick="cerrarModal('modalRechazar')">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/template.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin_solicitudes.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/template_submenu.js') }}"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</body>
+</html>

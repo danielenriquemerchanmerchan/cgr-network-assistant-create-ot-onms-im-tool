@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/logo_ico.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/servicio_cliente.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template_submenu.css') }}">
+    <!-- Leaflet CSS para mapas -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>smartsoc | Servicio al Cliente</title>
+</head>
+<body>
+    <div class="menu">
+        <ion-icon name="menu-outline"></ion-icon>
+        <ion-icon name="close-outline"></ion-icon>
+    </div>
+    
+    <div class="barra-lateral">
+        <div>
+            <div class="nombre-pagina">
+                <img id="icon-logo" class="ico-logo" src="{{ url_for('static', filename='img/logo.png') }}"/>
+                <img class="logo" src="{{ url_for('static', filename='img/nombre_logo.png') }}" />    
+            </div>
+            <div class="linea"></div>
+            <br>
+        </div>
+        
+        <nav class="navegacion">
+            <ul>
+                {% if menu_permisos.home %}
+                <li>
+                    <a id="home" href="{{ url_for('home') }}">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span>Home</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.callcenter %}
+                <li>
+                    <a href="{{ url_for('consultar_callcenter') }}">
+                        <ion-icon name="people-outline"></ion-icon>
+                        <span>Callcenter</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.callcenter_abonados %}
+                <li>
+                    <a id="callcenter_abonados" href="{{ url_for('callcenter_abonados') }}">
+                        <ion-icon name="accessibility-outline"></ion-icon>
+                        <span>Abonados</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.n1 %}
+                <li>
+                    <a id="n1_active" href="{{ url_for('n1') }}">
+                        <ion-icon name="speedometer-outline"></ion-icon>
+                        <span>Monitoreo N1</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.trabajos_programados %}
+                <li>
+                    <a id="trabajos_programados" href="{{ url_for('route_trabajos_programados') }}">
+                        <ion-icon name="calendar-outline"></ion-icon>
+                        <span>Trabajos Programados</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- DASHBOARDS CON SUBMENÚ -->
+                {% if menu_permisos.dashboard %}
+                <li class="has-submenu">
+                    <a href="{{ url_for('dashboard') }}">
+                        <ion-icon name="bar-chart-outline"></ion-icon>
+                        <span>Dashboards</span>
+                    </a>
+                    
+                    <!-- SUBMENÚ DE DASHBOARDS -->
+                    <ul class="submenu">
+                        <!-- Estado Red Fija -->
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_fija') }}">
+                                <ion-icon name="home-outline"></ion-icon>
+                                <span>Estado Red Fija</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <!-- Estado Red Móvil -->
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_movil') }}">
+                                <ion-icon name="phone-portrait-outline"></ion-icon>
+                                <span>Estado Red Móvil</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <!-- RED BACKHAUL CON SUBMENÚ ANIDADO -->
+                        {% if menu_permisos.dashboard %}
+                        <li class="has-submenu">
+                            <a href="{{ url_for('dash_backhaul') }}">
+                                <ion-icon name="git-network-outline"></ion-icon>
+                                <span>Red Backhaul</span>
+                            </a>
+                            
+                            <!-- SUBMENÚ ANIDADO DE BACKHAUL -->
+                            <ul class="submenu">
+                                <!-- Monitoreo HL5 -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('monitoreo_hl5') }}">
+                                        <ion-icon name="desktop-outline"></ion-icon>
+                                        <span>Monitoreo HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                <!-- Seguimiento HL5 -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('seguimiento_hl5') }}">
+                                        <ion-icon name="search-outline"></ion-icon>
+                                        <span>Seguimiento HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                <!-- Aperturas de Anillos -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('aperturas_anillos') }}">
+                                        <ion-icon name="git-branch-outline"></ion-icon>
+                                        <span>Anillos y Cabeceras</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.servicio_al_cliente %}
+                <li>
+                    <a id="servicio_al_cliente" href="{{ url_for('servicio_al_cliente') }}">
+                        <ion-icon name="globe-outline"></ion-icon>
+                        <span>Mapa de Fallas</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                                
+                <!-- Gobernanza - Solo para CG -->
+                {% if menu_permisos.gobernanza %}
+                <li>
+                    <a href="{{ url_for('gobernanza') }}">
+                        <ion-icon name="shield-checkmark-outline"></ion-icon>
+                        <span>Gobernanza</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.admin_solicitudes %}
+                <li>
+                    <a href="{{ url_for('admin_solicitudes') }}">
+                        <ion-icon name="person-add-outline"></ion-icon>
+                        <span>Solicitudes</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.gestion_usuarios %}
+                <li>
+                    <a href="{{ url_for('gestion_usuarios') }}">
+                        <ion-icon name="people-circle-outline"></ion-icon>
+                        <span>Gestión de Usuarios</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        
+        <div>
+            <div class="linea"></div>
+            <div class="usuario">
+                <img src="{{ url_for('static', filename='img/ico_person-circle-outline_blue.svg') }}" alt="" class="img_user">
+                <div class="info-usuario">
+                    <div class="usuario_red">
+                        <span class="usuario_name">{{ session['USUARIO'] }}</span>
+                        {% if perfil_usuario %}
+                        <small style="font-size: 10px; color: #666; margin-top: 2px;">{{ perfil_usuario }}</small>
+                        {% endif %}
+                    </div>
+                    <form action="{{ url_for('logout') }}" method="post">
+                        <button id="logoutBtn" class="logout-btn">
+                            <ion-icon name="log-out-outline"></ion-icon>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <main>
+        <!-- Header con tÃ­tulo y métricas clave -->
+        <div class="dashboard-header">
+            <div class="header-top">
+                <div class="page-title">
+                    <ion-icon name="globe-outline"></ion-icon>
+                    <h1>Mapa de Fallas y Mantenimientos</h1>
+                </div>
+                <div class="header-info">
+                    <ion-icon name="information-circle-outline"></ion-icon>
+                    <span>Próxima actualización: <strong id="proxima-actualizacion">--:--</strong></span>
+                </div>
+            </div>
+            
+            <!-- KPI Cards compactos -->
+            <div class="kpi-row">
+                <div class="kpi-card kpi-red">
+                    <div class="kpi-icon"><ion-icon name="alert-circle"></ion-icon></div>
+                    <div class="kpi-data">
+                        <div class="kpi-value" id="kpi-fallas">0</div>
+                        <div class="kpi-label">Fallas Activas</div>
+                    </div>
+                </div>
+                
+                <div class="kpi-card kpi-blue">
+                    <div class="kpi-icon"><ion-icon name="people"></ion-icon></div>
+                    <div class="kpi-data">
+                        <div class="kpi-value" id="kpi-usuarios">0</div>
+                        <div class="kpi-label">Usuarios Afectados</div>
+                    </div>
+                </div>
+                
+                <div class="kpi-card kpi-yellow">
+                    <div class="kpi-icon"><ion-icon name="construct"></ion-icon></div>
+                    <div class="kpi-data">
+                        <div class="kpi-value" id="kpi-mantenimientos">0</div>
+                        <div class="kpi-label">Mantenimientos</div>
+                    </div>
+                </div>
+                
+                <div class="kpi-card kpi-purple">
+                    <div class="kpi-icon"><ion-icon name="time"></ion-icon></div>
+                    <div class="kpi-data">
+                        <div class="kpi-value" id="kpi-criticos">0</div>
+                        <div class="kpi-label">Críticos (>72h)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filtros compactos -->
+        <div class="filters-compact">
+            <div class="filter-item">
+                <ion-icon name="layers-outline"></ion-icon>
+                <select id="filtro-tipo-evento" onchange="filtrarEventos()">
+                    <option value="ambos">Ambos</option>
+                    <option value="fallas">Solo Fallas</option>
+                    <option value="mantenimientos">Solo Mantenimientos</option>
+                </select>
+            </div>
+            
+            <div class="filter-item">
+                <ion-icon name="radio-outline"></ion-icon>
+                <select id="filtro-tecnologia" onchange="filtrarEventos()">
+                    <option value="todas">📶 Todas las tecnologías</option>
+                    <option value="3G">3G</option>
+                    <option value="4G">4G</option>
+                    <option value="5G">5G</option>
+                </select>
+            </div>
+            
+            <div class="filter-item">
+                <ion-icon name="map-outline"></ion-icon>
+                <select id="filtro-departamento" onchange="filtrarEventos()">
+                    <option value="todos">🗺️ Todos los departamentos</option>
+                </select>
+            </div>
+            
+            <div class="filter-item">
+                <ion-icon name="location-outline"></ion-icon>
+                <select id="filtro-municipio" onchange="filtrarEventos()">
+                    <option value="todos">📍 Todos los municipios</option>
+                </select>
+            </div>
+            
+            <div class="filter-item">
+                <ion-icon name="timer-outline"></ion-icon>
+                <select id="filtro-semaforo" onchange="filtrarEventos()">
+                    <option value="todos">Todos los tiempos</option>
+                    <option value="verde">🟢 Menos de 4 horas</option>
+                    <option value="amarillo">🟡 4 - 12 horas</option>
+                    <option value="naranja">🟠 12 - 24 horas</option>
+                    <option value="cafe">🟤 24 - 72 horas</option>
+                    <option value="rojo">🔴 Más de 72 horas</option>
+                </select>
+            </div>
+            
+            <button class="btn-reset" onclick="resetearFiltrosEventos()">
+                <ion-icon name="refresh-outline"></ion-icon>
+                Limpiar
+            </button>
+        </div>
+        
+        <!-- Contenedor de Mapa y MÃ©tricas lado a lado -->
+        <div class="map-metrics-container">
+            <!-- Columna Izquierda: Mapa -->
+            <div class="map-section">
+                <div id="mapa-eventos" class="mapa-principal"></div>
+                
+                <!-- Leyenda flotante -->
+                <div class="map-legend-float">
+                    <div class="legend-header">
+                        <ion-icon name="information-circle-outline"></ion-icon>
+                        <strong>Leyenda</strong>
+                    </div>
+                    <div class="legend-body">
+                        <div class="legend-row">
+                            <span class="legend-marker falla"></span>
+                            <span>Falla</span>
+                        </div>
+                        <div class="legend-row">
+                            <span class="legend-marker mantenimiento"></span>
+                            <span>Mantenimiento</span>
+                        </div>
+                        <div class="legend-divider"></div>
+                        <div class="legend-shapes">
+                            <span>🔺3G</span>
+                            <span>🔵4G</span>
+                            <span>⬜️5G</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Columna Derecha: MÃ©tricas de Fallas y Mantenimientos -->
+            <div class="metricas-laterales">
+                <!-- Sección: Métricas de Fallas -->
+                <div class="metricas-card">
+                    <div class="metricas-header">
+                        <div class="header-left">
+                            <ion-icon name="alert-circle-outline" style="color: #dc3545;"></ion-icon>
+                            <h3>Métricas de Fallas Activas</h3>
+                            <span class="badge-count" id="badge-fallas-count">0</span>
+                        </div>
+                        <div class="header-right">
+                            <ion-icon name="time-outline"></ion-icon>
+                            <span class="fecha-actualizacion">Actualizado: <strong id="fecha-ultima-carga-fallas">--</strong></span>
+                        </div>
+                    </div>
+                    <div class="metricas-content">
+                        <!-- 🆕 Fila 1: Total, Usuarios y PORCENTAJE (3 columnas) -->
+                        <div class="metrics-row row-primary">
+                            <div class="metric-box">
+                                <div class="metric-label">TOTAL</div>
+                                <div class="metric-value" id="contador-fallas">0</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">USUARIOS</div>
+                                <div class="metric-value" id="contador-usuarios">0</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">% USUARIOS AFECTADOS</div>
+                                <div class="metric-value" id="contador-porcentaje-fallas">0.00%</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Fila 2: 3G, 4G, 5G -->
+                        <div class="metrics-row row-tech">
+                            <div class="metric-box metric-tech">
+                                <div class="metric-label">3G</div>
+                                <div class="metric-value" id="contador-3g">0</div>
+                            </div>
+                            <div class="metric-box metric-tech">
+                                <div class="metric-label">4G</div>
+                                <div class="metric-value" id="contador-4g">0</div>
+                            </div>
+                            <div class="metric-box metric-tech">
+                                <div class="metric-label">5G</div>
+                                <div class="metric-value" id="contador-5g">0</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Fila 3: Semáforos de tiempo -->
+                        <div class="metrics-row row-time">
+                            <div class="time-metric verde">
+                                <div class="time-count" id="contador-verde">0</div>
+                                <div class="time-label">< 4h</div>
+                            </div>
+                            <div class="time-metric amarillo">
+                                <div class="time-count" id="contador-amarillo">0</div>
+                                <div class="time-label">4-12h</div>
+                            </div>
+                            <div class="time-metric naranja">
+                                <div class="time-count" id="contador-naranja">0</div>
+                                <div class="time-label">12-24h</div>
+                            </div>
+                            <div class="time-metric cafe">
+                                <div class="time-count" id="contador-cafe">0</div>
+                                <div class="time-label">24-72h</div>
+                            </div>
+                            <div class="time-metric rojo">
+                                <div class="time-count" id="contador-rojo">0</div>
+                                <div class="time-label">> 72h</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Fecha de actualización siempre visible -->
+                    <div class="update-stamp">
+                        <ion-icon name="time-outline"></ion-icon>
+                        <span>Actualizado: <strong id="fecha-ultima-carga-fallas">--</strong></span>
+                    </div>
+                </div>
+                
+                <!-- Sección: Métricas de Mantenimientos -->
+                <div class="metricas-card">
+                    <div class="metricas-header">
+                        <div class="header-left">
+                            <ion-icon name="construct-outline" style="color: #00a0c6;"></ion-icon>
+                            <h3>Métricas de Mantenimientos</h3>
+                            <span class="badge-count" id="badge-mant-count">0</span>
+                        </div>
+                        <div class="header-right">
+                            <ion-icon name="time-outline"></ion-icon>
+                            <span class="fecha-actualizacion">Actualizado: <strong id="fecha-ultima-carga-mant">--</strong></span>
+                        </div>
+                    </div>
+                    <div class="metricas-content">
+                        <!-- 🆕 Fila 1: Total, Usuarios y PORCENTAJE (3 columnas) -->
+                        <div class="metrics-row row-primary">
+                            <div class="metric-box">
+                                <div class="metric-label">TOTAL</div>
+                                <div class="metric-value" id="contador-mant-total">0</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">USUARIOS</div>
+                                <div class="metric-value" id="contador-mant-usuarios">0</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">% USUARIOS AFECTADOS</div>
+                                <div class="metric-value" id="contador-porcentaje-mant">0.00%</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Fila 2: 3G, 4G, 5G -->
+                        <div class="metrics-row row-tech">
+                            <div class="metric-box metric-tech">
+                                <div class="metric-label">3G</div>
+                                <div class="metric-value" id="contador-mant-3g">0</div>
+                            </div>
+                            <div class="metric-box metric-tech">
+                                <div class="metric-label">4G</div>
+                                <div class="metric-value" id="contador-mant-4g">0</div>
+                            </div>
+                            <div class="metric-box metric-tech">
+                                <div class="metric-label">5G</div>
+                                <div class="metric-value" id="contador-mant-5g">0</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Fila 3: Semáforos de tiempo -->
+                        <div class="metrics-row row-time">
+                            <div class="time-metric verde">
+                                <div class="time-count" id="contador-mant-verde">0</div>
+                                <div class="time-label">< 4h</div>
+                            </div>
+                            <div class="time-metric amarillo">
+                                <div class="time-count" id="contador-mant-amarillo">0</div>
+                                <div class="time-label">4-12h</div>
+                            </div>
+                            <div class="time-metric naranja">
+                                <div class="time-count" id="contador-mant-naranja">0</div>
+                                <div class="time-label">12-24h</div>
+                            </div>
+                            <div class="time-metric cafe">
+                                <div class="time-count" id="contador-mant-cafe">0</div>
+                                <div class="time-label">24-72h</div>
+                            </div>
+                            <div class="time-metric rojo">
+                                <div class="time-count" id="contador-mant-rojo">0</div>
+                                <div class="time-label">> 72h</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Fecha de actualización siempre visible -->
+                    <div class="update-stamp">
+                        <ion-icon name="time-outline"></ion-icon>
+                        <span>Actualizado: <strong id="fecha-ultima-carga-mant">--</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        
+        <!-- Secciones colapsables para tablas (debajo del mapa y mÃ©tricas) -->
+        <div class="collapsible-sections">
+            <!-- Sección: Tabla de Fallas (Colapsable) -->
+            <div class="collapsible-card">
+                <div class="collapsible-header" onclick="toggleCollapsible('tabla-fallas')">
+                    <div class="header-left">
+                        <ion-icon name="list-outline"></ion-icon>
+                        <h3>Detalle de Fallas Activas</h3>
+                        <span class="badge-count" id="badge-tabla-fallas">0</span>
+                    </div>
+                    <ion-icon name="chevron-down-outline" class="collapse-icon"></ion-icon>
+                </div>
+                <div class="collapsible-content collapsed" id="tabla-fallas">
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Ticket</th>
+                                    <th>Estación Base</th>
+                                    <th>Nombre del Sitio</th>
+                                    <th>Fecha Inicio</th>
+                                    <th>Municipio</th>
+                                    <th>Departamento</th>
+                                    <th>Tecnologí­a</th>
+                                    <th>Usuarios</th>
+                                    <th>Tiempo Afect.</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-fallas">
+                                <tr>
+                                    <td colspan="9" class="loading-cell">Cargando datos...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SecciÃ³n: Tabla de Mantenimientos (Colapsable) -->
+            <div class="collapsible-card">
+                <div class="collapsible-header" onclick="toggleCollapsible('tabla-mantenimientos')">
+                    <div class="header-left">
+                        <ion-icon name="list-outline"></ion-icon>
+                        <h3>Detalle de Mantenimientos Activos</h3>
+                        <span class="badge-count" id="badge-tabla-mant">0</span>
+                    </div>
+                    <ion-icon name="chevron-down-outline" class="collapse-icon"></ion-icon>
+                </div>
+                <div class="collapsible-content collapsed" id="tabla-mantenimientos">
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>BTP</th>
+                                    <th>Estación Base</th>
+                                    <th>Nombre Sitio</th>
+                                    <th>Fecha Inicio Afectación</th>
+                                    <th>Municipio</th>
+                                    <th>Departamento</th>
+                                    <th>Tecnología</th>
+                                    <th>Usuarios</th>
+                                    <th>Tiempo de Afectación</th>
+                                    <th>Fecha Fin Programado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-mantenimientos">
+                                <tr>
+                                    <td colspan="10" class="loading-cell">Cargando datos...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/template.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/template_submenu.js') }}"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='js/servicio_cliente.js') }}"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</body>
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/logo_ico.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}">
+    <title>smartsoc | Monitor Downdetector</title>
+    <style>
+        :root {
+            --color-barra-lateral: rgb(255,255,255);
+            --color-texto: #0166ff;
+            --color-texto-menu: #0b283a;
+            --color-boton: #0166ff;
+            --color-boton-texto: rgb(255,255,255);
+            --color-menu-hover: rgb(238,238,238);
+            --color-menu-hover-texto: #0166ff;
+        }
+
+        main {
+            padding: 20px;
+            margin-left: 250px;
+            transition: margin-left 0.5s ease;
+        }
+
+        main.min-main {
+            margin-left: 80px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            color: var(--color-texto);
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Contenedor de la gráfica embebida */
+        .embed-wrapper {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 3px 10px rgba(0,123,255,0.15);
+            margin-bottom: 20px;
+        }
+
+        .embed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .embed-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-texto-menu);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Iframe responsivo */
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%; /* Relación 16:9 */
+            background: #f5f5f5;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Para gráfica específica, usar altura fija */
+        .iframe-container.fixed-height {
+            height: 600px;
+            padding-bottom: 0;
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--color-boton);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .iframe-loaded .loading-spinner {
+            display: none;
+        }
+
+        /* Botones de acción */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--color-boton);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(1,102,255,0.3);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        /* Info box */
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .info-box p {
+            margin: 0;
+            color: #1565c0;
+            font-size: 13px;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-button.active {
+            color: var(--color-boton);
+            border-bottom-color: var(--color-boton);
+        }
+
+        .tab-button:hover:not(.active) {
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px 0;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            main {
+                margin-left: 0;
+            }
+
+            .embed-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu hamburguesa -->
+    <div class="menu">
+        <ion-icon name="menu-outline"></ion-icon>
+        <ion-icon name="close-outline"></ion-icon>
+    </div>
+
+    <!-- Barra lateral -->
+    <div class="barra-lateral">
+        <div>
+            <div class="nombre-pagina">
+                <img id="icon-logo" class="ico-logo" src="{{ url_for('static', filename='img/logo.png') }}"/>
+                <img class="logo" src="{{ url_for('static', filename='img/nombre_logo.png') }}"/>
+            </div>
+            <div class="linea"></div>
+            <br>
+        </div>
+        
+        <nav class="navegacion">
+            <ul>
+                <!-- Home - Visible para todos los perfiles autenticados -->
+                {% if menu_permisos.home %}
+                <li>
+                    <a id="home" href="{{ url_for('home') }}">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span>Home</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Callcenter - Solo para CG, Callcenter y ADMIN -->
+                {% if menu_permisos.callcenter %}
+                <li>
+                    <a href="{{ url_for('consultar_callcenter') }}">
+                        <ion-icon name="people-outline"></ion-icon>
+                        <span>Callcenter</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Abonados - Solo para CG, Callcenter y ADMIN -->
+                {% if menu_permisos.callcenter_abonados %}
+                <li>
+                    <a id="callcenter_abonados" href="{{ url_for('callcenter_abonados') }}">
+                        <ion-icon name="accessibility-outline"></ion-icon>
+                        <span>Abonados</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Dashboards - Para CG, Dashboards, Dashboards-Servicio al Cliente y ADMIN -->
+                {% if menu_permisos.dashboard %}
+                <li>
+                    <a href="{{ url_for('dashboard') }}">
+                        <ion-icon name="bar-chart-outline"></ion-icon>
+                        <span>Dashboards</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Servicio al Cliente - Para CG, Servicio al Cliente, Dashboards-Servicio al Cliente y ADMIN -->
+                {% if menu_permisos.servicio_al_cliente %}
+                <li>
+                    <a id="servicio_al_cliente" href="{{ url_for('servicio_al_cliente') }}">
+                        <ion-icon name="globe-outline"></ion-icon>
+                        <span>Servicio al Cliente</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Administrar Solicitudes - Solo para ADMIN -->
+                {% if menu_permisos.admin_solicitudes %}
+                <li>
+                    <a href="{{ url_for('admin_solicitudes') }}">
+                        <ion-icon name="person-add-outline"></ion-icon>
+                        <span>Solicitudes</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        
+        <div>
+            <div class="linea"></div>
+            <div class="usuario">
+                <img src="{{ url_for('static', filename='img/ico_person-circle-outline_blue.svg') }}" alt="" class="img_user">
+                <div class="info-usuario">
+                    <div class="usuario_red">
+                        <span class="usuario_name">{{ session['USUARIO'] }}</span>
+                        <!-- Badge de perfil -->
+                        {% if perfil_usuario %}
+                        <small style="font-size: 10px; color: #666; margin-top: 2px;">{{ perfil_usuario }}</small>
+                        {% endif %}
+                    </div>
+                    <form action="{{ url_for('logout') }}" method="post">
+                        <button id="logoutBtn" class="logout-btn">
+                            <ion-icon name="log-out-outline"></ion-icon>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <main>
+        <div class="page-header">
+            <h1>Monitor de Estado - Movistar</h1>
+            <p>Visualización en tiempo real desde Downdetector</p>
+        </div>
+
+        <div class="info-box">
+            <p>
+                <ion-icon name="information-circle-outline" style="vertical-align: middle;"></ion-icon>
+                <strong>Información:</strong> Esta vista carga el contenido de Downdetector a través de un proxy interno para evitar bloqueos de CORS y X-Frame-Options.
+            </p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab-button active" onclick="cambiarTab('completa')">
+                    <ion-icon name="desktop-outline"></ion-icon>
+                    Vista Completa
+                </button>
+                <button class="tab-button" onclick="cambiarTab('grafica')">
+                    <ion-icon name="stats-chart-outline"></ion-icon>
+                    Solo Gráfica
+                </button>
+            </div>
+
+            <!-- Tab 1: Vista Completa -->
+            <div id="tab-completa" class="tab-content active">
+                <div class="embed-wrapper">
+                    <div class="embed-header">
+                        <div class="embed-title">Estado de Movistar Colombia</div>
+                        <div class="status-badge">
+                            <span class="status-dot"></span>
+                            <span>En vivo</span>
+                        </div>
+                    </div>
+
+                    <div class="iframe-container fixed-height" id="iframe-container-1">
+                        <div class="loading-spinner"></div>
+                        <iframe 
+                            id="downdetector-iframe-full"
+                            src="/proxy/downdetector"
+                            title="Downdetector - Vista Completa"
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Solo Gráfica -->
+            <div id="tab-grafica" class="tab-content">
+                <div class="embed-wrapper">
+                    <div class="embed-header">
+                        <div class="embed-title">Gráfica de Reportes - Últimas 24 horas</div>
+                        <div class="status-badge">
+                            <span class="status-dot"></span>
+                            <span>Actualización automática</span>
+                        </div>
+                    </div>
+
+                    <div class="iframe-container fixed-height" id="iframe-container-2">
+                        <div class="loading-spinner"></div>
+                        <iframe 
+                            id="downdetector-iframe-chart"
+                            src="/proxy/downdetector-grafica"
+                            title="Downdetector - Solo Gráfica"
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="action-buttons">
+            <a href="https://downdetector.com.co/problemas/movistar/" 
+               target="_blank" 
+               class="btn btn-primary">
+                <ion-icon name="open-outline"></ion-icon>
+                Abrir en Downdetector
+            </a>
+            <button onclick="recargarIframe()" class="btn btn-secondary">
+                <ion-icon name="refresh-outline"></ion-icon>
+                Recargar
+            </button>
+            <button onclick="toggleFullscreen()" class="btn btn-secondary">
+                <ion-icon name="expand-outline"></ion-icon>
+                Pantalla Completa
+            </button>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/template.js') }}"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <script>
+        let currentTab = 'completa';
+
+        // Cambiar entre tabs
+        function cambiarTab(tab) {
+            currentTab = tab;
+
+            // Actualizar botones
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.tab-button').classList.add('active');
+
+            // Actualizar contenido
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById('tab-' + tab).classList.add('active');
+        }
+
+        // Recargar iframe activo
+        function recargarIframe() {
+            const iframe = currentTab === 'completa' 
+                ? document.getElementById('downdetector-iframe-full')
+                : document.getElementById('downdetector-iframe-chart');
+            
+            iframe.src = iframe.src;
+        }
+
+        // Pantalla completa
+        function toggleFullscreen() {
+            const container = currentTab === 'completa'
+                ? document.getElementById('iframe-container-1')
+                : document.getElementById('iframe-container-2');
+
+            if (!document.fullscreenElement) {
+                container.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Detectar cuando el iframe carga
+        window.addEventListener('load', () => {
+            const iframes = document.querySelectorAll('iframe');
+            
+            iframes.forEach((iframe, index) => {
+                iframe.addEventListener('load', () => {
+                    const container = iframe.closest('.iframe-container');
+                    container.classList.add('iframe-loaded');
+                });
+            });
+
+            // Recargar automáticamente cada 5 minutos
+            setInterval(() => {
+                const activeIframe = currentTab === 'completa'
+                    ? document.getElementById('downdetector-iframe-full')
+                    : document.getElementById('downdetector-iframe-chart');
+                
+                activeIframe.src = activeIframe.src;
+            }, 300000); // 5 minutos
+        });
+    </script>
+</body>
+</html>

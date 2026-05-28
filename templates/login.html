@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/logo_ico.ico') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css', v=1) }}">
+    <title>Login</title>
+</head>
+<body>
+    <div class="login">
+        <img src="{{ url_for('static', filename='img/letras_logo_login.png') }}" alt="Login" />
+        
+        <form method="post" action="{{ url_for('login') }}">
+            <input type="text" name="u" placeholder="Usuario" required="required" />
+            <input type="password" name="p" placeholder="Contraseña" required="required" />
+            <button class="login-btn">Ingresar</button>
+        </form>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Enlaces de registro y recuperación -->
+        <div class="registro-link">
+            <p>¿No tienes usuario? <a href="{{ url_for('registro') }}">Solicita uno aquí</a></p>
+            <p>¿Olvidaste tu contraseña? <a href="{{ url_for('recuperar_password') }}">Recupérala aquí</a></p>
+        </div>
+    </div>
+    <div id="footer"><span>Jefatura Centro de Gestión © 2024</span></div>
+</body>
+</html>

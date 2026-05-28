@@ -1,0 +1,119 @@
+/* ============================= */
+/*      TRABAJOS PROGRAMADOS    */
+/* ============================= */
+
+/* Contenedor principal del formulario */
+.form-call {
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* Layout horizontal */
+.form-layout {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+/* Columna izquierda (textarea) */
+.form-left {
+    flex: 1;
+    min-width: 350px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Textarea */
+#ips_input {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    resize: none;
+    box-sizing: border-box;
+    transition: 0.2s ease;
+}
+
+#ips_input:focus {
+    outline: none;
+    border-color: #0166ff;
+    box-shadow: 0 0 0 3px rgba(1, 102, 255, 0.1);
+}
+
+/* Texto ayuda */
+.form-left small {
+    margin-top: 8px;
+    color: #666;
+    font-size: 12px;
+}
+
+/* Columna derecha */
+.form-right {
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Botón consultar */
+.boton-consultar {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background-color: #0166ff;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.boton-consultar:hover {
+    background-color: #014ecc;
+}
+
+/* Tarjeta total registros */
+.total-registros {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    font-size: 14px;
+}
+
+/* ============================= */
+/*           TABLA              */
+/* ============================= */
+
+.tabla_resultado {
+    overflow-x: auto;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.tabla {
+    min-width: 3000px;
+    width: max-content;
+}
+
+/* Scroll personalizado */
+.tabla_resultado::-webkit-scrollbar {
+    height: 10px;
+}
+
+.tabla_resultado::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 5px;
+}
+
+.tabla_resultado::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+.tabla_resultado::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

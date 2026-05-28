@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/img/logo_ico.ico"/><!-- Carga Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/logo_ico.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/callcenter.css') }}"> <!-- Carga css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}"> <!-- Carga css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template_submenu.css') }}">
+    <title>smartsoc | Callcenter</title>
+</head>
+<body>
+    <div class="menu">
+        <ion-icon name="menu-outline"></ion-icon>
+        <ion-icon name="close-outline"></ion-icon>
+    </div>
+    <div class="barra-lateral">
+        <div>
+            <div class="nombre-pagina">
+                <img id="icon-logo" class="ico-logo" src="{{ url_for('static', filename='img/logo.png') }}"/>
+                <img class="logo" src="{{ url_for('static', filename='img/nombre_logo.png') }}" />    
+            </div>
+            <div class="linea"></div>
+            <br>
+        </div>
+        
+        <nav class="navegacion">
+            <ul>
+                <!-- Home - Visible para todos los perfiles autenticados -->
+                {% if menu_permisos.home %}
+                <li>
+                    <a id="home" href="{{ url_for('home') }}">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span>Home</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Callcenter - Solo para CG, Callcenter y ADMIN -->
+                {% if menu_permisos.callcenter %}
+                <li>
+                    <a href="{{ url_for('consultar_callcenter') }}">
+                        <ion-icon name="people-outline"></ion-icon>
+                        <span>Callcenter</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Abonados - Solo para CG, Callcenter y ADMIN -->
+                {% if menu_permisos.callcenter_abonados %}
+                <li>
+                    <a id="callcenter_abonados" href="{{ url_for('callcenter_abonados') }}">
+                        <ion-icon name="accessibility-outline"></ion-icon>
+                        <span>Abonados</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.n1 %}
+                <li>
+                    <a id="n1_active" href="{{ url_for('n1') }}">
+                        <ion-icon name="speedometer-outline"></ion-icon>
+                        <span>Monitoreo N1</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.trabajos_programados %}
+                <li>
+                    <a id="trabajos_programados" href="{{ url_for('route_trabajos_programados') }}">
+                        <ion-icon name="calendar-outline"></ion-icon>
+                        <span>Trabajos Programados</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Dashboards - Para CG, Dashboards, Dashboards-Servicio al Cliente y ADMIN -->
+                <!-- DASHBOARDS CON SUBMENÚ -->
+                {% if menu_permisos.dashboard %}
+                <li class="has-submenu">
+                    <a href="{{ url_for('dashboard') }}">
+                        <ion-icon name="bar-chart-outline"></ion-icon>
+                        <span>Dashboards</span>
+                    </a>
+                    
+                    <!-- SUBMENÚ DE DASHBOARDS -->
+                    <ul class="submenu">
+                        <!-- Estado Red Fija -->
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_fija') }}">
+                                <ion-icon name="home-outline"></ion-icon>
+                                <span>Estado Red Fija</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <!-- Estado Red Móvil -->
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_movil') }}">
+                                <ion-icon name="phone-portrait-outline"></ion-icon>
+                                <span>Estado Red Móvil</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <!-- RED BACKHAUL CON SUBMENÚ ANIDADO -->
+                        {% if menu_permisos.dashboard %}
+                        <li class="has-submenu">
+                            <a href="{{ url_for('dash_backhaul') }}">
+                                <ion-icon name="git-network-outline"></ion-icon>
+                                <span>Red Backhaul</span>
+                            </a>
+                            
+                            <!-- SUBMENÚ ANIDADO DE BACKHAUL -->
+                            <ul class="submenu">
+                                <!-- Monitoreo HL5 -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('monitoreo_hl5') }}">
+                                        <ion-icon name="desktop-outline"></ion-icon>
+                                        <span>Monitoreo HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                <!-- Seguimiento HL5 -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('seguimiento_hl5') }}">
+                                        <ion-icon name="search-outline"></ion-icon>
+                                        <span>Seguimiento HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                <!-- Aperturas de Anillos -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('aperturas_anillos') }}">
+                                        <ion-icon name="git-branch-outline"></ion-icon>
+                                        <span>Anillos y Cabeceras</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% endif %}
+                
+                <!-- Servicio al Cliente - Para CG, Servicio al Cliente, Dashboards-Servicio al Cliente y ADMIN -->
+                {% if menu_permisos.servicio_al_cliente %}
+                <li>
+                    <a id="servicio_al_cliente" href="{{ url_for('servicio_al_cliente') }}">
+                        <ion-icon name="globe-outline"></ion-icon>
+                        <span>Mapa de Fallas</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Administrar Solicitudes - Solo para ADMIN -->
+                {% if menu_permisos.admin_solicitudes %}
+                <li>
+                    <a href="{{ url_for('admin_solicitudes') }}">
+                        <ion-icon name="person-add-outline"></ion-icon>
+                        <span>Solicitudes</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Gestión de Usuarios - Solo para ADMIN -->
+                {% if menu_permisos.gestion_usuarios %}
+                <li>
+                    <a href="{{ url_for('gestion_usuarios') }}">
+                        <ion-icon name="people-circle-outline"></ion-icon>
+                        <span>Gestión de Usuarios</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        
+        <div>
+            <div class="linea"></div>
+            <div class="usuario">
+                <img src="{{ url_for('static', filename='img/ico_person-circle-outline_blue.svg') }}" alt="" class="img_user">
+                <div class="info-usuario">
+                    <div class="usuario_red">
+                        <span class="usuario_name">{{ session['USUARIO'] }}</span>
+                        <!-- Badge de perfil -->
+                        {% if perfil_usuario %}
+                        <small style="font-size: 10px; color: #666; margin-top: 2px;">{{ perfil_usuario }}</small>
+                        {% endif %}
+                    </div>
+                    <form action="{{ url_for('logout') }}" method="post">
+                        <button id="logoutBtn" class="logout-btn">
+                            <ion-icon name="log-out-outline"></ion-icon>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <main>
+        <h1>Callcenter</h1>
+        <br>
+        <p>Consultas Acceso Fijo</p>
+        <br>
+        <div class="contenido-call">
+           <div class="form-call">
+            <form class="formulario" action="" method="post">
+                <div class="form-text">
+                    <input type="text" placeholder="Ingrese Id_Equipo" name="id_equipo">
+                    <input type="text" placeholder="Ingrese Tarjeta" name="tarjeta">
+                    <input type="text" placeholder="Ingrese Puerto" name="puerto">
+                   <!--<input type="text" placeholder="Ingrese el numero de abonado" name="NUMERO_ABONADO">-->
+                </div>
+                <div class="form-boton">
+                    <br>
+                    <br>
+                    <button class="boton-consultar" type="submit">Consultar</button>
+                </div>
+            </form>
+            <div class="linea-call"></div>
+           </div>
+           <div class="conteo-clientes">
+            <span><b>Total Servicios:</b> {{ total_servicios }}</span>
+            </div>
+           <div class="tabla_resultado">
+            <table class="tabla">
+                <thead class="encabezado-tabla">
+                    <tr>
+                        <th>Telefono</th>
+                        <th>ID_Cliente</th>
+                        <th>Fecha Creación</th>
+                        <th>Cuenta Padre</th>
+                        <th>Tecnología</th>
+                        <th>Zona Cobertura</th>
+                        <th>ID_Equipo</th>
+                        <th>Tarjeta</th>
+                        <th>Puerto</th>
+                        <th>Ont</th>
+                        <th>Vel_Plan</th>
+                        <th>Estado Servicio</th>
+                        <th>Tipo Puerto</th>
+                        <th>NUMERO ABONADO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in resultados %}
+                    <tr>
+                        <td>{{ row['Telefono'] }}</td>
+                        <td>{{ row['ID_Cliente'] }}</td>
+                        <td>{{ row['fecha_creacion'] }}</td>
+                        <td>{{ row['cuenta_padre'] }}</td>
+                        <td>{{ row['tecnologia'] }}</td>
+                        <td>{{ row['zona_cobertura'] }}</td>
+                        <td>{{ row['id_equipo'] }}</td>
+                        <td>{{ row['tarjeta'] }}</td>
+                        <td>{{ row['puerto'] }}</td>
+                        <td>{{ row['OntId'] }}</td>
+                        <td>{{ row['vel_plan'] }}</td>
+                        <td>{{ row['estado_servicio'] }}</td>
+                        <td>{{ row['tipo_puerto'] }}</td>
+                        <td>{{ row['NUMERO_ABONADO'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+                            
+    </main>
+          
+    <!--<script src="{{ url_for('static', filename='js/home.js') }}"></script>--> <!-- Aquí src es la ruta de tu archivo JS -->
+    <script src="{{ url_for('static', filename='js/template.js') }}"></script> <!-- Aquí src es la ruta de tu archivo JS -->
+    <script src="{{ url_for('static', filename='js/template_submenu.js') }}"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    
+</body>
+</html>

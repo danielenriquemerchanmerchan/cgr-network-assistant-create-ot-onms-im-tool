@@ -1,0 +1,66 @@
+:root{
+    --color-barra-lateral: rgb(255,255,255);
+    --color-texto: #0166ff;
+    --color-texto-menu: #0b283a;
+    --color-boton: #0166ff;
+    --color-boton-texto: rgb(255,255,255);
+    --color-menu-hover: rgb(238,238,238);
+    --color-menu-hover-texto: #0166ff;
+    --color-linea:rgb(241,241,241);
+    --color-scroll: #0166ff;
+    --color-scroll-hover: rgb(1, 158, 244);
+}
+
+#home{
+    background-color: var(--color-menu-hover);
+    color: var(--color-menu-hover-texto);
+}
+
+main .cajas-home{
+    width: 100%;
+    margin-top: 20px;
+}
+
+main .cajas-home ul{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 25px;
+}
+
+main .cajas-home li{
+    background-color: var(--color-barra-lateral);
+    border-radius: 30px;
+    list-style: none;
+    margin-bottom: 5px;
+    height: 150px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+main .cajas-home li:hover{
+    background-color: var(--color-menu-hover);
+}
+
+main .cajas-home a{
+    display: grid;
+    justify-items: center;
+}
+
+main .cajas-home .iconos{
+    width: 60px;
+}
+
+main .cajas-home ion-icon{
+    font-size: 70px;
+    color: var(--color-texto);
+}
+
+main .cajas-home a{
+    text-decoration: none;
+}
+
+main .cajas-home span{
+    margin-top: 10px;
+    color: var(--color-texto);
+}

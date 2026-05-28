@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/logo_ico.ico') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/registro.css') }}">
+    <title>Registro - SmartSOC</title>
+</head>
+<body>
+    <div class="registro-container">
+        <img src="{{ url_for('static', filename='img/letras_logo_login.png') }}" alt="SmartSOC Logo" class="logo-registro" />
+        
+        {% if solicitud_enviada %}
+        <div class="mensaje-exito">
+            <h2>¡Solicitud Enviada!</h2>
+            <p>Tu solicitud de usuario está siendo revisada para aprobación.</p>
+            <p>Recibirás una notificación cuando tu cuenta sea activada.</p>
+            <a href="{{ url_for('login') }}" class="btn-volver">Volver al Login</a>
+        </div>
+        {% else %}
+        <h2>Solicitud de Usuario</h2>
+        <form method="post" action="{{ url_for('registro') }}" id="formRegistro">
+            <div class="form-group">
+                <input type="text" name="nombre" placeholder="Nombre" required />
+            </div>
+            
+            <div class="form-group">
+                <input type="text" name="apellido" placeholder="Apellido" required />
+            </div>
+            
+            <div class="form-group">
+                <input type="email" name="correo" placeholder="Correo Electrónico" required />
+            </div>
+            
+            <div class="form-group">
+                <input type="text" name="area" placeholder="Área" required />
+            </div>
+            
+            <div class="form-group">
+                <input type="text" name="usuario_red" placeholder="Usuario de Red" required />
+            </div>
+            
+            <div class="form-group">
+                <input type="tel" name="telefono" placeholder="Teléfono" required />
+            </div>
+            
+            <div class="form-group">
+                <input type="password" name="password" id="password" placeholder="Contraseña" required 
+                       pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" 
+                       title="Debe contener al menos 8 caracteres, incluyendo mayúsculas, minúsculas y números" />
+                <small class="password-hint">La contraseña debe tener al menos 8 caracteres, con mayúsculas, minúsculas y números</small>
+            </div>
+            
+            <div class="form-group">
+                <input type="password" name="confirmar_password" id="confirmar_password" placeholder="Confirmar Contraseña" required />
+                <small class="error-message" id="password-error"></small>
+            </div>
+            
+            <button type="submit" class="btn-registro">Enviar Solicitud</button>
+        </form>
+        
+        <div class="login-link">
+            <a href="{{ url_for('login') }}">← Volver al Login</a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div id="footer"><span>Jefatura Centro de Gestión © 2024</span></div>
+    
+    <script>
+        const form = document.getElementById('formRegistro');
+        const password = document.getElementById('password');
+        const confirmarPassword = document.getElementById('confirmar_password');
+        const errorMessage = document.getElementById('password-error');
+        
+        form.addEventListener('submit', function(e) {
+            if (password.value !== confirmarPassword.value) {
+                e.preventDefault();
+                errorMessage.textContent = 'Las contraseñas no coinciden';
+                confirmarPassword.style.borderColor = 'red';
+            }
+        });
+        
+        confirmarPassword.addEventListener('input', function() {
+            if (password.value === confirmarPassword.value) {
+                errorMessage.textContent = '';
+                confirmarPassword.style.borderColor = '';
+            }
+        });
+    </script>
+</body>
+</html>

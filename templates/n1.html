@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/logo_ico.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template_submenu.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/n1.css') }}">
+    <title>smartsoc | Monitoreo N1</title>
+</head>
+<body>
+    <div class="menu">
+        <ion-icon name="menu-outline"></ion-icon>
+        <ion-icon name="close-outline"></ion-icon>
+    </div>
+
+    <!-- ===== BARRA LATERAL ===== -->
+    <div class="barra-lateral">
+        <div>
+            <div class="nombre-pagina">
+                <img id="icon-logo" class="ico-logo" src="{{ url_for('static', filename='img/logo.png') }}"/>
+                <img class="logo" src="{{ url_for('static', filename='img/nombre_logo.png') }}"/>
+            </div>
+            <div class="linea"></div>
+            <br>
+        </div>
+
+        <nav class="navegacion">
+            <ul>
+                {% if menu_permisos.home %}
+                <li>
+                    <a href="{{ url_for('home') }}">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span>Home</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.callcenter %}
+                <li>
+                    <a href="{{ url_for('consultar_callcenter') }}">
+                        <ion-icon name="people-outline"></ion-icon>
+                        <span>Callcenter</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.callcenter_abonados %}
+                <li>
+                    <a href="{{ url_for('callcenter_abonados') }}">
+                        <ion-icon name="accessibility-outline"></ion-icon>
+                        <span>Abonados</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.n1 %}
+                <li>
+                    <a id="n1_active" href="{{ url_for('n1') }}">
+                        <ion-icon name="speedometer-outline"></ion-icon>
+                        <span>Monitoreo N1</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.trabajos_programados %}
+                <li>
+                    <a href="{{ url_for('route_trabajos_programados') }}">
+                        <ion-icon name="calendar-outline"></ion-icon>
+                        <span>Trabajos Programados</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.dashboard %}
+                <li class="has-submenu">
+                    <a href="{{ url_for('dashboard') }}">
+                        <ion-icon name="bar-chart-outline"></ion-icon>
+                        <span>Dashboards</span>
+                    </a>
+                    <ul class="submenu">
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_fija') }}">
+                                <ion-icon name="home-outline"></ion-icon>
+                                <span>Estado Red Fija</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_movil') }}">
+                                <ion-icon name="phone-portrait-outline"></ion-icon>
+                                <span>Estado Red Móvil</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% if menu_permisos.dashboard %}
+                        <li class="has-submenu">
+                            <a href="{{ url_for('dash_backhaul') }}">
+                                <ion-icon name="git-network-outline"></ion-icon>
+                                <span>Red Backhaul</span>
+                            </a>
+                            <ul class="submenu">
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('monitoreo_hl5') }}">
+                                        <ion-icon name="desktop-outline"></ion-icon>
+                                        <span>Monitoreo HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('seguimiento_hl5') }}">
+                                        <ion-icon name="search-outline"></ion-icon>
+                                        <span>Seguimiento HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('aperturas_anillos') }}">
+                                        <ion-icon name="git-branch-outline"></ion-icon>
+                                        <span>Anillos y Cabeceras</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.servicio_al_cliente %}
+                <li>
+                    <a href="{{ url_for('servicio_al_cliente') }}">
+                        <ion-icon name="globe-outline"></ion-icon>
+                        <span>Mapa de Fallas</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.gobernanza %}
+                <li>
+                    <a href="{{ url_for('gobernanza') }}">
+                        <ion-icon name="shield-checkmark-outline"></ion-icon>
+                        <span>Gobernanza</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.admin_solicitudes %}
+                <li>
+                    <a href="{{ url_for('admin_solicitudes') }}">
+                        <ion-icon name="person-add-outline"></ion-icon>
+                        <span>Solicitudes</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.gestion_usuarios %}
+                <li>
+                    <a href="{{ url_for('gestion_usuarios') }}">
+                        <ion-icon name="people-circle-outline"></ion-icon>
+                        <span>Gestión de Usuarios</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <div>
+            <div class="linea"></div>
+            <div class="usuario">
+                <img src="{{ url_for('static', filename='img/ico_person-circle-outline_blue.svg') }}" alt="" class="img_user">
+                <div class="info-usuario">
+                    <div class="usuario_red">
+                        <span class="usuario_name">{{ session['USUARIO'] }}</span>
+                        {% if perfil_usuario %}
+                        <small style="font-size: 10px; color: #666; margin-top: 2px; display: block;">{{ perfil_usuario }}</small>
+                        {% endif %}
+                    </div>
+                    <form action="{{ url_for('logout') }}" method="post">
+                        <button class="logout-btn">
+                            <ion-icon name="log-out-outline"></ion-icon>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
+    <main>
+        <div class="n1-container">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <ion-icon name="speedometer-outline"></ion-icon>
+                    Monitoreo N1
+                </h1>
+                <div class="page-header-actions">
+                    <button class="btn-refresh" onclick="cargarTodo()" title="Actualizar datos">
+                        <ion-icon name="refresh-outline"></ion-icon>
+                        Actualizar
+                    </button>
+                    <div class="actualizacion-info">
+                        <span class="ultima-actualizacion" id="ultimaActualizacion">—</span>
+                        <span class="countdown-label" id="countdownLabel">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================
+                 SECCIÓN 1: BANDEJA BACKOFFICE
+                 ============================ -->
+            <div class="seccion-card" id="seccionBandeja">
+                <div class="seccion-header bandeja">
+                    <div class="seccion-titulo">
+                        <ion-icon name="albums-outline"></ion-icon>
+                        <span>Total OT's en Bandeja de Backoffice</span>
+                        <span class="badge-contador" id="badgeBandeja">0</span>
+                    </div>
+                    <div class="seccion-actions">
+                        <span class="registros-label" id="totalBandeja">Cargando...</span>
+                        <button class="btn-limpiar-filtros" onclick="limpiarFiltros('bandeja')">
+                            <ion-icon name="close-circle-outline"></ion-icon>
+                            Limpiar Filtros
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Contadores categoria + Antiguedad en la misma fila -->
+                <div class="bandeja-contadores" id="bandejaContadores">
+                    <div class="contador-card contador-hl5" title="Filtrar HL5" onclick="filtrarPorContador('CATEGORIA','HL5')">
+                        <div class="contador-icon"><ion-icon name="radio-outline"></ion-icon></div>
+                        <div class="contador-info"><span class="contador-valor" id="cntHl5">0</span><span class="contador-label">HL5</span></div>
+                    </div>
+                    <div class="contador-card contador-iptv" title="Filtrar IPTV" onclick="filtrarPorContador('CATEGORIA','IPTV')">
+                        <div class="contador-icon"><ion-icon name="tv-outline"></ion-icon></div>
+                        <div class="contador-info"><span class="contador-valor" id="cntIptv">0</span><span class="contador-label">IPTV</span></div>
+                    </div>
+                    <div class="contador-card contador-performance" title="Filtrar Performance" onclick="filtrarPorContador('CATEGORIA','Performance Fusión')">
+                        <div class="contador-icon"><ion-icon name="analytics-outline"></ion-icon></div>
+                        <div class="contador-info"><span class="contador-valor" id="cntPerformance">0</span><span class="contador-label">Performance Fusión</span></div>
+                    </div>
+                    <div class="contador-card contador-anillos" title="Filtrar Anillos" onclick="filtrarPorContador('CATEGORIA','Anillos y Cabeceras')">
+                        <div class="contador-icon"><ion-icon name="git-branch-outline"></ion-icon></div>
+                        <div class="contador-info"><span class="contador-valor" id="cntAnillos">0</span><span class="contador-label">Anillos y Cabeceras</span></div>
+                    </div>
+                    <div class="contador-card contador-others" title="Filtrar Others" onclick="filtrarPorContador('CATEGORIA','OTHERS')">
+                        <div class="contador-icon"><ion-icon name="help-circle-outline"></ion-icon></div>
+                        <div class="contador-info"><span class="contador-valor" id="cntOthers">0</span><span class="contador-label">Others</span></div>
+                    </div>
+                    <div class="contador-separador">
+                        <div class="contador-separador-line"></div>
+                        <span class="contador-separador-label">Antigüedad</span>
+                        <div class="contador-separador-line"></div>
+                    </div>
+                    <div class="bandeja-antiguedad-bar" id="bandejaAntiguedadBar">
+                        <div class="ant-card ant-card-vencida" id="cntVencidasCard" title="Filtrar mas de 1 dia" onclick="filtrarPorContador('ANTIGUEDAD','> 1 día')">
+                            <div class="ant-card-icon"><ion-icon name="warning-outline"></ion-icon></div>
+                            <div class="ant-card-info"><span class="ant-card-valor" id="cntVencidas">0</span><span class="ant-card-label">Más de 1 día</span><span class="ant-card-sub">Requieren acción inmediata</span></div>
+                        </div>
+                        <div class="ant-card ant-card-ok" id="cntEnTiempoCard" title="Filtrar menos de 1 dia" onclick="filtrarPorContador('ANTIGUEDAD','≤ 1 día')">
+                            <div class="ant-card-icon"><ion-icon name="checkmark-circle-outline"></ion-icon></div>
+                            <div class="ant-card-info"><span class="ant-card-valor" id="cntEnTiempo">0</span><span class="ant-card-label">Menos de 1 día</span><span class="ant-card-sub">Dentro del tiempo</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tabla-wrapper">
+                    <table id="tablaBandeja">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Incidente
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="bandeja" data-col="INCIDENTE"></ion-icon>
+                                </th>
+                                <th>
+                                    Resumen
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="bandeja" data-col="RESUMEN"></ion-icon>
+                                </th>
+                                <th>
+                                    Fecha Inicio
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="bandeja" data-col="FECHA_INICIO"></ion-icon>
+                                </th>
+                                <th>
+                                    Estado Inc.
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="bandeja" data-col="ESTADO"></ion-icon>
+                                </th>
+                                <th>
+                                    OT
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="bandeja" data-col="OT"></ion-icon>
+                                </th>
+                                <th>
+                                    Estado OT
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="bandeja" data-col="ESTADO_OT"></ion-icon>
+                                </th>
+                                <th>
+                                    Grupo OT
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="bandeja" data-col="GRUPO_OT"></ion-icon>
+                                </th>
+                                <th>
+                                    Categoría
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="bandeja" data-col="CATEGORIA"></ion-icon>
+                                </th>
+                                <th>
+                                    Antigüedad
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="bandeja" data-col="ANTIGUEDAD"></ion-icon>
+                                </th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyBandeja">
+                            <tr>
+                                <td colspan="10" class="loading">
+                                    <div class="spinner"></div>
+                                    Cargando datos...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================
+                 SECCIÓN 2: RETENCIÓN DE HL5
+                 ============================ -->
+            <div class="seccion-card" id="seccionRetencion">
+                <div class="seccion-header retencion">
+                    <div class="seccion-titulo">
+                        <ion-icon name="radio-outline"></ion-icon>
+                        <span>Retención de HL5</span>
+                        <span class="badge-contador" id="badgeRetencion">0</span>
+                    </div>
+                    <div class="seccion-actions">
+                        <span class="registros-label" id="totalRetencion">Cargando...</span>
+                        <button class="btn-limpiar-filtros" id="btnLimpiarFiltrosRet" onclick="limpiarFiltros('retencion')">
+                            <ion-icon name="close-circle-outline"></ion-icon>
+                            Limpiar Filtros
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Estadísticas de gestión HL5 -->
+                <div class="retencion-stats" id="retencionStats">
+                    <div class="ret-stat-card ret-stat-retencion" title="Tickets activos en retención / seguimiento">
+                        <div class="ret-stat-icon"><ion-icon name="radio-outline"></ion-icon></div>
+                        <div class="ret-stat-info">
+                            <span class="ret-stat-valor" id="statRetencion">—</span>
+                            <span class="ret-stat-label">En Retención</span>
+                        </div>
+                    </div>
+                    <div class="ret-stat-card ret-stat-escaladas" title="Tickets escalados a campo">
+                        <div class="ret-stat-icon"><ion-icon name="arrow-up-circle-outline"></ion-icon></div>
+                        <div class="ret-stat-info">
+                            <span class="ret-stat-valor" id="statEscaladas">—</span>
+                            <span class="ret-stat-label">Escalados a Campo</span>
+                        </div>
+                    </div>
+                    <div class="ret-stat-card ret-stat-cerradas" title="Tickets cerrados / resueltos">
+                        <div class="ret-stat-icon"><ion-icon name="checkmark-done-circle-outline"></ion-icon></div>
+                        <div class="ret-stat-info">
+                            <span class="ret-stat-valor" id="statCerradas">—</span>
+                            <span class="ret-stat-label">Cerrados</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tabla-wrapper">
+                    <table id="tablaRetencion">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Incidente
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="retencion" data-col="INCIDENTE"></ion-icon>
+                                </th>
+                                <th>
+                                    Nodo HL5
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="retencion" data-col="NODO"></ion-icon>
+                                </th>
+                                <th>
+                                    IP
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="retencion" data-col="IP"></ion-icon>
+                                </th>
+                                <th>
+                                    Ubicación
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="retencion" data-col="UBICACION"></ion-icon>
+                                </th>
+                                <th>
+                                    Resumen
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="retencion" data-col="RESUMEN"></ion-icon>
+                                </th>
+                                <th>
+                                    Fecha Inicio
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="retencion" data-col="FECHA_INICIO"></ion-icon>
+                                </th>
+                                <th>
+                                    OT
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="retencion" data-col="OT"></ion-icon>
+                                </th>
+                                <th>
+                                    Estado OT
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="retencion" data-col="ESTADO_OT"></ion-icon>
+                                </th>
+                                <th>
+                                    Tipo Retención
+                                    <ion-icon name="filter-outline" class="filter-icon" data-tabla="retencion" data-col="TIPO_RETENCION"></ion-icon>
+                                </th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyRetencion">
+                            <tr>
+                                <td colspan="10" class="loading">
+                                    <div class="spinner"></div>
+                                    Cargando datos...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- fin n1-container -->
+    </main>
+
+    <!-- ============================
+         MODAL ÚNICO DE ACCIONES OT
+         ============================ -->
+    <div id="modalAcciones" class="modal-overlay" onclick="cerrarModalSiOverlay(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><ion-icon name="create-outline"></ion-icon> Gestión de OT</h3>
+                <button class="modal-close" onclick="cerrarModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <!-- Info de la OT seleccionada -->
+                <div class="modal-info" id="modalInfo"></div>
+
+                <!-- Menú de opciones -->
+                <div id="menuOpciones" class="modal-actions">
+                    <div class="action-option" onclick="mostrarFormulario('avance')">
+                        <ion-icon name="document-text-outline"></ion-icon>
+                        <div class="action-option-content">
+                            <div class="action-option-title">Insertar Avance</div>
+                            <div class="action-option-desc">Agregar avance sobre el progreso de la OT</div>
+                        </div>
+                    </div>
+                    <div class="action-option" onclick="mostrarFormulario('cerrar')">
+                        <ion-icon name="checkmark-circle-outline"></ion-icon>
+                        <div class="action-option-content">
+                            <div class="action-option-title">Cerrar OT</div>
+                            <div class="action-option-desc">Marcar la orden de trabajo como completada</div>
+                        </div>
+                    </div>
+                    <div class="action-option" onclick="mostrarFormulario('escalar')">
+                        <ion-icon name="arrow-up-circle-outline"></ion-icon>
+                        <div class="action-option-content">
+                            <div class="action-option-title">Escalar OT</div>
+                            <div class="action-option-desc">Escalar OT a otro grupo responsable de la revisión</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulario de avance -->
+                <div id="formAvance" style="display:none;">
+                    <form onsubmit="enviarAvance(event)">
+                        <div class="form-grupo">
+                            <label class="form-label">Comentario de Avance *</label>
+                            <textarea class="form-textarea" id="avanceComentario" required
+                                placeholder="Describe el avance realizado..."></textarea>
+                        </div>
+                        <div class="form-botones">
+                            <button type="button" class="btn btn-secondary" onclick="volverMenu()">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Guardar Avance</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Formulario de cierre -->
+                <div id="formCerrar" style="display:none;">
+                    <form onsubmit="cerrarOT(event)">
+                        <div class="form-grupo">
+                            <label class="form-label">Comentario de Cierre *</label>
+                            <textarea class="form-textarea" id="cierreComentario" required
+                                placeholder="Describe la solución aplicada..."></textarea>
+                        </div>
+                        <div class="form-grupo">
+                            <label class="form-label">Estado Final *</label>
+                            <select class="form-select" id="cierreEstado" required>
+                                <option value="">Seleccione...</option>
+                                <option value="COMP">Completado</option>
+                                <option value="CLOSE">Cerrado</option>
+                                <option value="CANCEL">Cancelado</option>
+                            </select>
+                        </div>
+                        <div class="form-botones">
+                            <button type="button" class="btn btn-secondary" onclick="volverMenu()">Cancelar</button>
+                            <button type="submit" class="btn btn-success">Cerrar OT</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Formulario de escalamiento -->
+                <div id="formEscalar" style="display:none;">
+                    <form onsubmit="escalarOT(event)">
+                        <div class="form-grupo">
+                            <label class="form-label">Área de Escalamiento *</label>
+                            <select class="form-select" id="escalarArea" required>
+                                <option value="">Seleccione...</option>
+                                <option value="O_CAMBO">Operaciones Campo Bogotá</option>
+                                <option value="O_CAMBA">Operaciones Campo Caribe</option>
+                                <option value="O_CAMBU">Operaciones Campo Bucaramanga - Nororiente</option>
+                                <option value="O_CAMCA">Operaciones Campo Cali - Suroccidente</option>
+                                <option value="O_CAMCU">Operaciones Campo Cundinamarca</option>
+                                <option value="O_CAMME">Operaciones Campo Medellín</option>
+                                <option value="O_CAMPE">Operaciones Campo Pereira - Eje Cafetero</option>
+                                <option value="O_CAMSO">Operaciones Campo Suroriente</option>
+                                <option value="O_CAMND">Operaciones Campo Territorios Nacionales</option>
+                                <option value="O_CAMSA">Operaciones Campo San Andrés</option>
+                                <option value="O_GESFO">Gestión Fibra Óptica</option>
+                                <option value="O_GESTRA">Gestión Transmisión</option>
+                                <option value="O_DXINT">Datos e Internet</option>
+                                <option value="BACKOFFICE_N1">Backoffice N1</option>
+                            </select>
+                        </div>
+                        <div class="form-grupo">
+                            <label class="form-label">Motivo de Escalamiento *</label>
+                            <textarea class="form-textarea" id="escalarMotivo" required
+                                placeholder="Explica por qué se debe escalar esta OT..."></textarea>
+                        </div>
+                        <div class="form-botones">
+                            <button type="button" class="btn btn-secondary" onclick="volverMenu()">Cancelar</button>
+                            <button type="submit" class="btn btn-danger">Escalar OT</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================
+         MODAL FILTRO DE COLUMNAS
+         ============================ -->
+    <div id="filter-modal" class="filter-modal">
+        <div class="filter-modal-content">
+            <div class="filter-modal-header">
+                <span class="filter-modal-title">Filtrar por valores:</span>
+                <span class="filter-modal-close">&times;</span>
+            </div>
+            <div class="filter-modal-body">
+                <div class="filter-search-box">
+                    <ion-icon name="search-outline"></ion-icon>
+                    <input type="text" id="filter-search-input" placeholder="Buscar valor...">
+                </div>
+                <div class="filter-bulk-actions">
+                    <button type="button" id="filter-select-all" class="filter-bulk-btn">Seleccionar todo</button>
+                    <button type="button" id="filter-clear" class="filter-bulk-btn secondary">Limpiar selección</button>
+                </div>
+                <div class="filter-options-container" id="filter-options-container"></div>
+            </div>
+            <div class="filter-modal-footer">
+                <button class="filter-btn-ok" id="filter-btn-ok">Ok</button>
+                <button class="filter-btn-cancel" id="filter-btn-cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================
+         TOAST DE NOTIFICACIONES
+         ============================ -->
+    <div id="toastNotif" class="toast-notif" style="display:none;"></div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/template.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/template_submenu.js') }}"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="{{ url_for('static', filename='js/n1.js') }}"></script>
+
+    <script>
+        /* ---- Gestión de Sesión ---- */
+        const SESION_PERMANENTE = {{ session.get('SESION_PERMANENTE', 0) | int }};
+        const TIMEOUT_INACTIVIDAD_MS = 30 * 60 * 1000; // 30 minutos (igual que Flask)
+        const PING_INTERVAL_MS = 10 * 60 * 1000;       // ping cada 10 minutos
+
+        let inactividadTimer = null;
+
+        /* Mantener la sesión del servidor viva */
+        function pingServidor() {
+            fetch('/ping_session', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+                .catch(() => {}); // silenciar errores de red
+        }
+        setInterval(pingServidor, PING_INTERVAL_MS);
+
+        /* Timer de inactividad — solo para sesiones NO permanentes */
+        if (!SESION_PERMANENTE) {
+            function logoutDueToInactivity() {
+                alert("Has sido desconectado por inactividad (30 min).");
+                document.querySelector('form[action*="logout"]').submit();
+            }
+            function resetTimeout() {
+                clearTimeout(inactividadTimer);
+                inactividadTimer = setTimeout(logoutDueToInactivity, TIMEOUT_INACTIVIDAD_MS);
+            }
+            window.addEventListener('load', resetTimeout);
+            document.addEventListener('mousemove', resetTimeout);
+            document.addEventListener('keydown', resetTimeout);
+            document.addEventListener('click', resetTimeout);
+            document.addEventListener('scroll', resetTimeout);
+        }
+    </script>
+
+</body>
+</html>

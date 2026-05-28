@@ -1,0 +1,402 @@
+:root{
+    --color-barra-lateral: rgb(255,255,255);
+    --color-texto: #0166ff;
+    --color-texto-menu: #0b283a;
+    --color-boton: #0166ff;
+    --color-boton-texto: rgb(255,255,255);
+    --color-menu-hover: rgb(238,238,238);
+    --color-menu-hover-texto: #0166ff;
+    --color-linea:rgb(241,241,241);
+    --color-aprobado: #28a745;
+    --color-rechazado: #dc3545;
+    --color-pendiente: #ffc107;
+}
+
+* {
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Flash Messages */
+.flash-messages {
+    margin-bottom: 20px;
+}
+
+.alert {
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Filtros */
+.filtros-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.filtro-item label {
+    margin-right: 10px;
+    font-weight: 600;
+    color: var(--color-texto-menu);
+}
+
+.filtro-item select {
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+}
+
+.contador-solicitudes {
+    display: flex;
+    gap: 20px;
+}
+
+.contador-solicitudes span {
+    font-size: 14px;
+    color: var(--color-texto-menu);
+}
+
+.badge-pendiente {
+    background-color: var(--color-pendiente);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+/* Tabla */
+.tabla-container {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+
+.tabla-solicitudes {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.tabla-solicitudes thead {
+    background-color: var(--color-boton);
+    color: white;
+}
+
+.tabla-solicitudes th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tabla-solicitudes td {
+    padding: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.tabla-solicitudes tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Badges de Estado */
+.badge {
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.badge-pendiente {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.badge-aprobado {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.badge-rechazado {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Botones de Acción */
+.btn-accion {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+    margin: 2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+}
+
+.btn-accion ion-icon {
+    font-size: 16px;
+}
+
+.btn-aprobar {
+    background-color: var(--color-aprobado);
+    color: white;
+}
+
+.btn-aprobar:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+.btn-rechazar {
+    background-color: var(--color-rechazado);
+    color: white;
+}
+
+.btn-rechazar:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+}
+
+.btn-ver {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-ver:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* No Solicitudes */
+.no-solicitudes {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.no-solicitudes ion-icon {
+    font-size: 80px;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.no-solicitudes p {
+    font-size: 18px;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 30px;
+    border: 1px solid #888;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: slideDown 0.3s;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-content h2 {
+    color: var(--color-texto-menu);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--color-boton);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 20px;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+}
+
+.modal-info {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.modal-info p {
+    margin: 8px 0;
+    color: var(--color-texto-menu);
+}
+
+.form-group-modal {
+    margin-bottom: 20px;
+}
+
+.form-group-modal label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--color-texto-menu);
+}
+
+.form-group-modal select,
+.form-group-modal textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    outline: none;
+}
+
+.form-group-modal select:focus,
+.form-group-modal textarea:focus {
+    border-color: var(--color-boton);
+    box-shadow: 0 0 5px rgba(1, 102, 255, 0.3);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.btn-modal {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-modal ion-icon {
+    font-size: 20px;
+}
+
+.btn-confirmar {
+    background-color: var(--color-aprobado);
+    color: white;
+}
+
+.btn-confirmar:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+.btn-rechazar-confirmar {
+    background-color: var(--color-rechazado);
+    color: white;
+}
+
+.btn-rechazar-confirmar:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+}
+
+.btn-cancelar {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-cancelar:hover {
+    background-color: #5a6268;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filtros-container {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .contador-solicitudes {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .tabla-container {
+        overflow-x: scroll;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+        padding: 20px;
+    }
+    
+    .modal-buttons {
+        flex-direction: column;
+    }
+    
+    .btn-accion {
+        font-size: 11px;
+        padding: 5px 8px;
+    }
+}

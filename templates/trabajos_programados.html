@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/logo_ico.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/callcenter_a.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template_submenu.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/trabajos_programados.css') }}">
+    <title>smartsoc | Trabajos Programados</title>
+</head>
+
+<body>
+
+<div class="menu">
+    <ion-icon name="menu-outline"></ion-icon>
+    <ion-icon name="close-outline"></ion-icon>
+</div>
+
+<div class="barra-lateral">
+    <div>
+            <div class="nombre-pagina">
+                <img id="icon-logo" class="ico-logo" src="{{ url_for('static', filename='img/logo.png') }}"/>
+                <img class="logo" src="{{ url_for('static', filename='img/nombre_logo.png') }}"/>
+            </div>
+            <div class="linea"></div>
+            <br>
+        </div>
+        
+        <nav class="navegacion">
+            <ul>
+                {% if menu_permisos.home %}
+                <li>
+                    <a id="home" href="{{ url_for('home') }}">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span>Home</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.callcenter %}
+                <li>
+                    <a href="{{ url_for('consultar_callcenter') }}">
+                        <ion-icon name="people-outline"></ion-icon>
+                        <span>Callcenter</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.callcenter_abonados %}
+                <li>
+                    <a id="callcenter_abonados" href="{{ url_for('callcenter_abonados') }}">
+                        <ion-icon name="accessibility-outline"></ion-icon>
+                        <span>Abonados</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.n1 %}
+                <li>
+                    <a id="n1_active" href="{{ url_for('n1') }}">
+                        <ion-icon name="speedometer-outline"></ion-icon>
+                        <span>Monitoreo N1</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.trabajos_programados %}
+                <li>
+                    <a id="trabajos_programados" href="{{ url_for('route_trabajos_programados') }}">
+                        <ion-icon name="calendar-outline"></ion-icon>
+                        <span>Trabajos Programados</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- DASHBOARDS CON SUBMENÚ -->
+                {% if menu_permisos.dashboard %}
+                <li class="has-submenu">
+                    <a href="{{ url_for('dashboard') }}">
+                        <ion-icon name="bar-chart-outline"></ion-icon>
+                        <span>Dashboards</span>
+                    </a>
+                    
+                    <!-- SUBMENÚ DE DASHBOARDS -->
+                    <ul class="submenu">
+                        <!-- Estado Red Fija -->
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_fija') }}">
+                                <ion-icon name="home-outline"></ion-icon>
+                                <span>Estado Red Fija</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <!-- Estado Red Móvil -->
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_movil') }}">
+                                <ion-icon name="phone-portrait-outline"></ion-icon>
+                                <span>Estado Red Móvil</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <!-- RED BACKHAUL CON SUBMENÚ ANIDADO -->
+                        {% if menu_permisos.dashboard %}
+                        <li class="has-submenu">
+                            <a href="{{ url_for('dash_backhaul') }}">
+                                <ion-icon name="git-network-outline"></ion-icon>
+                                <span>Red Backhaul</span>
+                            </a>
+                            
+                            <!-- SUBMENÚ ANIDADO DE BACKHAUL -->
+                            <ul class="submenu">
+                                <!-- Monitoreo HL5 -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('monitoreo_hl5') }}">
+                                        <ion-icon name="desktop-outline"></ion-icon>
+                                        <span>Monitoreo HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                <!-- Seguimiento HL5 -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('seguimiento_hl5') }}">
+                                        <ion-icon name="search-outline"></ion-icon>
+                                        <span>Seguimiento HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                <!-- Aperturas de Anillos -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('aperturas_anillos') }}">
+                                        <ion-icon name="git-branch-outline"></ion-icon>
+                                        <span>Anillos y Cabeceras</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.servicio_al_cliente %}
+                <li>
+                    <a id="servicio_al_cliente" href="{{ url_for('servicio_al_cliente') }}">
+                        <ion-icon name="globe-outline"></ion-icon>
+                        <span>Mapa de Fallas</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Gobernanza - Solo para CG -->
+                {% if menu_permisos.gobernanza %}
+                <li>
+                    <a href="{{ url_for('gobernanza') }}">
+                        <ion-icon name="shield-checkmark-outline"></ion-icon>
+                        <span>Gobernanza</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.admin_solicitudes %}
+                <li>
+                    <a href="{{ url_for('admin_solicitudes') }}">
+                        <ion-icon name="person-add-outline"></ion-icon>
+                        <span>Solicitudes</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Gestión de Usuarios - Solo para ADMIN -->
+                {% if menu_permisos.gestion_usuarios %}
+                <li>
+                    <a href="{{ url_for('gestion_usuarios') }}">
+                        <ion-icon name="people-circle-outline"></ion-icon>
+                        <span>Gestión de Usuarios</span>
+                    </a>
+                </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+        
+        <div>
+            <div class="linea"></div>
+            <div class="usuario">
+                <img src="{{ url_for('static', filename='img/ico_person-circle-outline_blue.svg') }}" alt="" class="img_user">
+                <div class="info-usuario">
+                    <div class="usuario_red">
+                        <span class="usuario_name">{{ session['USUARIO'] }}</span>
+                        {% if perfil_usuario %}
+                        <small style="font-size: 10px; color: #666; margin-top: 2px; display: block;">{{ perfil_usuario }}</small>
+                        {% endif %}
+                    </div>
+                    <form id="logoutForm" action="{{ url_for('logout') }}" method="post">
+                        <button id="logoutBtn" class="logout-btn">
+                            <ion-icon name="log-out-outline"></ion-icon>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+</div>
+
+<main>
+    <h1>Trabajos Programados</h1>
+    <br>
+    <p>Consultas Equipos OLT por IP</p>
+    <br>
+
+    <div class="contenido-call">
+        <div class="form-call">
+
+            <form class="formulario"
+                  id="formTrabajos"
+                  action="{{ url_for('route_trabajos_programados') }}"
+                  method="post"
+                  onsubmit="return validarFormulario()">
+
+                <div class="form-layout">
+
+                    <!-- COLUMNA IZQUIERDA -->
+                    <div class="form-left">
+                        <textarea
+                            id="ips_input"
+                            name="ips_input"
+                            placeholder="Ingrese las IPs separadas por comas. Ejemplo: 192.168.1.1, 192.168.1.2">{{ ips_consultadas if ips_consultadas else '' }}</textarea>
+
+                        <small>
+                            💡 Puede ingresar hasta 20 IPs separadas por comas
+                        </small>
+                    </div>
+
+                    <!-- COLUMNA DERECHA -->
+                    <div class="form-right">
+
+                        <button type="submit" class="boton-consultar">
+                            Consultar
+                        </button>
+
+                        {% if resultados %}
+                        <div class="total-registros">
+                            <strong>Total Registros</strong>
+                            <div style="font-size:18px; margin-top:5px;">
+                                {{ resultados|length }}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </form>
+
+            <div class="linea-call"></div>
+        </div>
+
+        <!-- Botón descarga -->
+        {% if resultados %}
+        <div class="conteo-clientes">
+    
+            <button type="button"
+                    class="boton-consultar"
+                    onclick="descargarExcel()"
+                    style="background:#1D6F42; display:flex; align-items:center; gap:6px; padding:8px 18px;">
+                <ion-icon name="download-outline"></ion-icon>
+                Descargar Excel
+            </button>
+
+        </div>
+        {% endif %}
+
+        <div class="tabla_resultado">
+            <table class="tabla" id="tablaResultados">
+                <thead class="encabezado-tabla">
+                <tr>
+                    <th>Line ID</th>
+                    <th>Port</th>
+                    <th>DSLAM</th>
+                    <th>DSLAM IP</th>
+                    <th>CTO</th>
+                    <th>Producto</th>
+                    <th>DBA Profile</th>
+                    <th>Activado</th>
+                    <th>Velocidad</th>
+                    <th>SSID</th>
+                    <th>Teléfono</th>
+                    <th>CINUM</th>
+                    <th>Tipo Equipo</th>
+                    <th>Status</th>
+                    <th>Descripción SIT</th>
+                    <th>Operación</th>
+                    <th>Grupo</th>
+                    <th>Nombre OSS</th>
+                    <th>Dirección IP</th>
+                    <th>Zona Operaciones</th>
+                    <th>Departamento</th>
+                    <th>Municipio</th>
+                    <th>Localidad</th>
+                    <th>BA Servicio</th>
+                    <th>DX Servicio</th>
+                    <th>Líneas</th>
+                    <th>Circuitos</th>
+                    <th>E1</th>
+                    <th>IPTV</th>
+                    <th>Fabricante</th>
+                    <th>Zona PR</th>
+                    <th>Proveedor</th>
+                    <th>EECC</th>
+                    <th>Actualización</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                {% if resultados %}
+                    {% for row in resultados %}
+                    <tr>
+                        <td>{{ row['line_id'] or 'N/A' }}</td>
+                        <td>{{ row['port'] or 'N/A' }}</td>
+                        <td>{{ row['dslam'] or 'N/A' }}</td>
+                        <td>{{ row['dslam_ip'] or 'N/A' }}</td>
+                        <td>{{ row['cto'] or 'N/A' }}</td>
+                        <td>{{ row['service_product'] or 'N/A' }}</td>
+                        <td>{{ row['dba_profile'] or 'N/A' }}</td>
+                        <td>{{ row['activated'] or 'N/A' }}</td>
+                        <td>{{ row['velocidad'] or 'N/A' }}</td>
+                        <td>{{ row['ssid'] or 'N/A' }}</td>
+                        <td>{{ row['phonenumber'] or 'N/A' }}</td>
+                        <td>{{ row['cinum'] or 'N/A' }}</td>
+                        <td>{{ row['tipo_equipo'] or 'N/A' }}</td>
+                        <td>{{ row['status'] or 'N/A' }}</td>
+                        <td>{{ row['sit_description'] or 'N/A' }}</td>
+                        <td>{{ row['operacion'] or 'N/A' }}</td>
+                        <td>{{ row['persongroup'] or 'N/A' }}</td>
+                        <td>{{ row['nombre_oss'] or 'N/A' }}</td>
+                        <td>{{ row['direccion_ip'] or 'N/A' }}</td>
+                        <td>{{ row['zona_operaciones'] or 'N/A' }}</td>
+                        <td>{{ row['depto_description'] or 'N/A' }}</td>
+                        <td>{{ row['mun_description'] or 'N/A' }}</td>
+                        <td>{{ row['loc_description'] or 'N/A' }}</td>
+                        <td>{{ row['baservicio'] or 'N/A' }}</td>
+                        <td>{{ row['dxservicio'] or 'N/A' }}</td>
+                        <td>{{ row['lineas_serv'] or 'N/A' }}</td>
+                        <td>{{ row['circuitos_ser'] or 'N/A' }}</td>
+                        <td>{{ row['e1_ser'] or 'N/A' }}</td>
+                        <td>{{ row['iptv_servicio'] or 'N/A' }}</td>
+                        <td>{{ row['fabricante'] or 'N/A' }}</td>
+                        <td>{{ row['zona_operativa_pr'] or 'N/A' }}</td>
+                        <td>{{ row['proveedor_red_pr'] or 'N/A' }}</td>
+                        <td>{{ row['eecc_pe'] or 'N/A' }}</td>
+                        <td>{{ row['fecha_actualizacion'] or 'N/A' }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="34" style="text-align:center;">
+                            {% if request.method == 'POST' %}
+                                No se encontraron resultados.
+                            {% else %}
+                                Ingrese IPs para realizar la consulta.
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</main>
+
+<script src="{{ url_for('static', filename='js/template.js') }}"></script>
+<script src="{{ url_for('static', filename='js/template_submenu.js') }}"></script>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const textarea = document.getElementById("ips_input");
+
+    function autoResize() {
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + "px";
+    }
+
+    textarea.addEventListener("input", autoResize);
+    autoResize();
+});
+
+function validarFormulario() {
+    const textarea = document.getElementById('ips_input');
+    const valor = textarea.value.trim();
+    
+    if (!valor) {
+        alert('Por favor ingrese al menos una dirección IP');
+        return false;
+    }
+    
+    // Separar por comas y limpiar espacios
+    const ips = valor.split(',').map(ip => ip.trim()).filter(ip => ip);
+    
+    if (ips.length === 0) {
+        alert('No se encontraron IPs válidas');
+        return false;
+    }
+    
+    if (ips.length > 20) {
+        alert('Máximo 20 IPs permitidas. Tiene ' + ips.length);
+        return false;
+    }
+    
+    // Validar formato básico de IP
+    const regexIP = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    
+    for (let i = 0; i < ips.length; i++) {
+        if (!regexIP.test(ips[i])) {
+            alert('IP inválida: ' + ips[i] + '\n\nFormato esperado: xxx.xxx.xxx.xxx');
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+function descargarExcel() {
+    const tabla = document.getElementById('tablaResultados');
+    if (!tabla) {
+        alert('No hay tabla para descargar');
+        return;
+    }
+
+    // Obtener encabezados
+    const headers = [];
+    tabla.querySelectorAll('thead th').forEach(th => {
+        headers.push(th.innerText);
+    });
+
+    // Obtener filas
+    const filas = [];
+    tabla.querySelectorAll('tbody tr').forEach(tr => {
+        const fila = [];
+        tr.querySelectorAll('td').forEach(td => {
+            fila.push(td.innerText);
+        });
+        // Solo agregar filas que tengan datos reales
+        if (fila.length > 0 && fila[0] !== '' && !fila[0].includes('No se encontraron') && !fila[0].includes('Ingrese IPs')) {
+            filas.push(fila);
+        }
+    });
+
+    if (filas.length === 0) {
+        alert('No hay datos para exportar');
+        return;
+    }
+
+    // Construir contenido CSV con separador para Excel
+    let csv = '\uFEFF'; // BOM para UTF-8
+    csv += headers.join(';') + '\n';
+    filas.forEach(fila => {
+        csv += fila.join(';') + '\n';
+    });
+
+    // Crear enlace de descarga
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const fecha = new Date().toISOString().slice(0, 10);
+    link.href = url;
+    link.download = `inventario_olt_${fecha}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    console.log('✅ Descarga iniciada:', `inventario_olt_${fecha}.csv`);
+}
+</script>
+
+</body>
+</html>

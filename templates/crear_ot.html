@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/logo_ico.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template_submenu.css') }}">
+    <title>smartsoc | Crear OT RBHFO (demo)</title>
+
+    <!-- Estilos inline mínimos: marcar que es demo, no producción.
+         Fernanda reemplazará todo esto al integrar en onms.html. -->
+    <style>
+        .demo-banner {
+            background: #fff3cd;
+            border: 1px solid #ffe69c;
+            color: #664d03;
+            padding: 12px 18px;
+            border-radius: 6px;
+            margin: 16px 0 24px 0;
+            font-size: 14px;
+        }
+        .demo-banner strong { color: #5c3a00; }
+
+        .demo-wrap {
+            max-width: 720px;
+            margin: 24px auto;
+            padding: 0 24px;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .demo-wrap h1 {
+            font-size: 22px;
+            color: #1a3a5c;
+            margin-bottom: 4px;
+        }
+        .demo-wrap .demo-sub {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .demo-form fieldset {
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            padding: 16px 20px 20px 20px;
+            margin-bottom: 18px;
+        }
+        .demo-form legend {
+            font-weight: 600;
+            color: #1a3a5c;
+            padding: 0 8px;
+            font-size: 14px;
+        }
+        .demo-form label {
+            display: block;
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 6px;
+            margin-top: 12px;
+        }
+        .demo-form label:first-of-type { margin-top: 0; }
+        .demo-form input[type=text],
+        .demo-form select {
+            width: 100%;
+            padding: 8px 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .demo-form .hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .demo-form button {
+            background: #1a3a5c;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .demo-form button:hover { background: #265084; }
+
+        .demo-resultado {
+            margin-top: 24px;
+            padding: 16px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .demo-resultado.ok    { background: #d1f0d8; border: 1px solid #8ed3a0; color: #0c4a23; }
+        .demo-resultado.error { background: #fde2e2; border: 1px solid #f0a0a0; color: #6a1212; }
+        .demo-resultado pre {
+            background: rgba(0,0,0,0.05);
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            overflow-x: auto;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu">
+        <ion-icon name="menu-outline"></ion-icon>
+        <ion-icon name="close-outline"></ion-icon>
+    </div>
+
+    <!-- ===== BARRA LATERAL (clon del de onms.html, agregando entrada "Crear OT") ===== -->
+    <div class="barra-lateral">
+        <div>
+            <div class="nombre-pagina">
+                <img id="icon-logo" class="ico-logo" src="{{ url_for('static', filename='img/logo.png') }}"/>
+                <img class="logo" src="{{ url_for('static', filename='img/nombre_logo.png') }}"/>
+            </div>
+            <div class="linea"></div>
+            <br>
+        </div>
+
+        <nav class="navegacion">
+            <ul>
+                {% if menu_permisos.home %}
+                <li>
+                    <a href="{{ url_for('home') }}">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span>Home</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.callcenter %}
+                <li>
+                    <a href="{{ url_for('consultar_callcenter') }}">
+                        <ion-icon name="people-outline"></ion-icon>
+                        <span>Callcenter</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.callcenter_abonados %}
+                <li>
+                    <a href="{{ url_for('callcenter_abonados') }}">
+                        <ion-icon name="accessibility-outline"></ion-icon>
+                        <span>Abonados</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.n1 %}
+                <li>
+                    <a href="{{ url_for('n1') }}">
+                        <ion-icon name="speedometer-outline"></ion-icon>
+                        <span>Monitoreo N1</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.trabajos_programados %}
+                <li>
+                    <a href="{{ url_for('route_trabajos_programados') }}">
+                        <ion-icon name="calendar-outline"></ion-icon>
+                        <span>Trabajos Programados</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.dashboard %}
+                <li class="has-submenu">
+                    <a href="{{ url_for('dashboard') }}">
+                        <ion-icon name="bar-chart-outline"></ion-icon>
+                        <span>Dashboards</span>
+                    </a>
+                    <ul class="submenu">
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_fija') }}">
+                                <ion-icon name="home-outline"></ion-icon>
+                                <span>Estado Red Fija</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_movil') }}">
+                                <ion-icon name="phone-portrait-outline"></ion-icon>
+                                <span>Estado Red Móvil</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% if menu_permisos.dashboard %}
+                        <li class="has-submenu">
+                            <a href="{{ url_for('dash_backhaul') }}">
+                                <ion-icon name="git-network-outline"></ion-icon>
+                                <span>Red Backhaul</span>
+                            </a>
+                            <ul class="submenu">
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('monitoreo_hl5') }}">
+                                        <ion-icon name="desktop-outline"></ion-icon>
+                                        <span>Monitoreo HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('seguimiento_hl5') }}">
+                                        <ion-icon name="search-outline"></ion-icon>
+                                        <span>Seguimiento HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('aperturas_anillos') }}">
+                                        <ion-icon name="git-branch-outline"></ion-icon>
+                                        <span>Anillos y Cabeceras</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.onms %}
+                <li>
+                    <a href="{{ url_for('onms') }}">
+                        <ion-icon name="git-merge-outline"></ion-icon>
+                        <span>ONMS</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {# Entrada nueva: Crear OT — usa el mismo permiso 'onms' #}
+                {% if menu_permisos.onms %}
+                <li>
+                    <a href="{{ url_for('onms_crear_ot_get') }}">
+                        <ion-icon name="add-circle-outline"></ion-icon>
+                        <span>Crear OT</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.servicio_al_cliente %}
+                <li>
+                    <a href="{{ url_for('servicio_al_cliente') }}">
+                        <ion-icon name="globe-outline"></ion-icon>
+                        <span>Mapa de Fallas</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.gobernanza %}
+                <li>
+                    <a href="{{ url_for('gobernanza') }}">
+                        <ion-icon name="shield-checkmark-outline"></ion-icon>
+                        <span>Gobernanza</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.admin_solicitudes %}
+                <li>
+                    <a href="{{ url_for('admin_solicitudes') }}">
+                        <ion-icon name="person-add-outline"></ion-icon>
+                        <span>Solicitudes</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.gestion_usuarios %}
+                <li>
+                    <a href="{{ url_for('gestion_usuarios') }}">
+                        <ion-icon name="people-circle-outline"></ion-icon>
+                        <span>Gestión de Usuarios</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <div>
+            <div class="linea"></div>
+            <div class="usuario">
+                <img src="{{ url_for('static', filename='img/ico_person-circle-outline_blue.svg') }}" alt="" class="img_user">
+                <div class="info-usuario">
+                    <div class="usuario_red">
+                        <span class="usuario_name">{{ session['USUARIO'] }}</span>
+                        {% if perfil_usuario %}
+                        <small style="font-size: 10px; color: #666; margin-top: 2px; display: block;">{{ perfil_usuario }}</small>
+                        {% endif %}
+                    </div>
+                    <form id="logoutForm" action="{{ url_for('logout') }}" method="post">
+                        <button id="logoutBtn" class="logout-btn">
+                            <ion-icon name="log-out-outline"></ion-icon>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN ===== -->
+    <main>
+        <div class="demo-wrap">
+            <div class="demo-banner">
+                <strong>Demo funcional —</strong> esta página solo demuestra que el backend de creación de OTs RBHFO funciona end-to-end (Postgres → armado → Maximo). El frontend definitivo lo integrará el equipo de UI dentro de <code>onms.html</code>.
+            </div>
+
+            <h1>Crear OT RBHFO</h1>
+            <p class="demo-sub">Falla de Fibra Óptica en tramo BHFO. Crea la OT en Maximo con sus 15 specs.</p>
+
+            <form class="demo-form" method="POST" action="{{ url_for('onms_crear_ot_get') }}">
+                <fieldset>
+                    <legend>Enlace afectado</legend>
+
+                    <label for="punta_a">Punta A (device HL5)</label>
+                    <input type="text" id="punta_a" name="punta_a" required
+                           value="{{ form_data.punta_a if form_data else '' }}"
+                           placeholder="Ej: HL5-BOGOTA-01">
+
+                    <label for="punta_b">Punta B (device HL5)</label>
+                    <input type="text" id="punta_b" name="punta_b" required
+                           value="{{ form_data.punta_b if form_data else '' }}"
+                           placeholder="Ej: HL5-FACATATIVA-02">
+
+                    <div class="hint">El orden no importa: la consulta acepta A→B o B→A.</div>
+
+                    <label for="lado">Lado al que se despacha la cuadrilla</label>
+                    <select id="lado" name="lado" required>
+                        <option value="origen"  {% if form_data and form_data.lado == 'origen'  %}selected{% endif %}>origen</option>
+                        <option value="destino" {% if form_data and form_data.lado == 'destino' %}selected{% endif %}>destino</option>
+                    </select>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Quien reporta</legend>
+
+                    <label for="persona_que_reporta">Persona que reporta (personid Maximo)</label>
+                    <input type="text" id="persona_que_reporta" name="persona_que_reporta" required
+                           value="{{ form_data.persona_que_reporta if form_data else '' }}"
+                           placeholder="Ej: DMERCHAN">
+
+                    <label for="area_que_reporta_fo">Área que reporta (código)</label>
+                    <input type="text" id="area_que_reporta_fo" name="area_que_reporta_fo" required
+                           value="{{ form_data.area_que_reporta_fo if form_data else '' }}"
+                           placeholder="Ej: NOC">
+                </fieldset>
+
+                <button type="submit">Crear OT en Maximo</button>
+            </form>
+
+            {% if resultado %}
+                {% if resultado.ok %}
+                <div class="demo-resultado ok">
+                    <strong>✓ OT creada correctamente.</strong><br>
+                    <strong>wonum:</strong> {{ resultado.wonum }}<br>
+                    <strong>description:</strong> {{ resultado.description }}<br>
+                    <strong>specs cargadas:</strong> {{ resultado.specs_count }}
+                    {% if resultado.detalle %}
+                    <pre>{{ resultado.detalle }}</pre>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="demo-resultado error">
+                    <strong>✗ Error:</strong> {{ resultado.mensaje }}
+                    {% if resultado.detalle %}
+                    <pre>{{ resultado.detalle }}</pre>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- Scripts (mismos que onms.html para que sidebar e ionicons anden) -->
+    <script src="{{ url_for('static', filename='js/template.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/template_submenu.js') }}"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</body>
+</html>

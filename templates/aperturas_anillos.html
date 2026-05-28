@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/logo_ico.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template_submenu.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/apertura_anillos.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <title>smartsoc | Aperturas Cabeceras y Anillos HL5</title>
+</head>
+<body>
+    <div class="menu">
+        <ion-icon name="menu-outline"></ion-icon>
+        <ion-icon name="close-outline"></ion-icon>
+    </div>
+    
+    <div class="barra-lateral">
+        <div>
+            <div class="nombre-pagina">
+                <img id="icon-logo" class="ico-logo" src="{{ url_for('static', filename='img/logo.png') }}"/>
+                <img class="logo" src="{{ url_for('static', filename='img/nombre_logo.png') }}" />    
+            </div>
+            <div class="linea"></div>
+            <br>
+        </div>
+        
+        <nav class="navegacion">
+            <ul>
+                <!-- Home - Visible para todos los perfiles autenticados -->
+                {% if menu_permisos.home %}
+                <li>
+                    <a id="home" href="{{ url_for('home') }}">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span>Home</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Callcenter - Solo para CG, Callcenter y ADMIN -->
+                {% if menu_permisos.callcenter %}
+                <li>
+                    <a href="{{ url_for('consultar_callcenter') }}">
+                        <ion-icon name="people-outline"></ion-icon>
+                        <span>Callcenter</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Abonados - Solo para CG, Callcenter y ADMIN -->
+                {% if menu_permisos.callcenter_abonados %}
+                <li>
+                    <a id="callcenter_abonados" href="{{ url_for('callcenter_abonados') }}">
+                        <ion-icon name="accessibility-outline"></ion-icon>
+                        <span>Abonados</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.n1 %}
+                <li>
+                    <a id="n1_active" href="{{ url_for('n1') }}">
+                        <ion-icon name="speedometer-outline"></ion-icon>
+                        <span>Monitoreo N1</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.trabajos_programados %}
+                <li>
+                    <a id="trabajos_programados" href="{{ url_for('route_trabajos_programados') }}">
+                        <ion-icon name="calendar-outline"></ion-icon>
+                        <span>Trabajos Programados</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Dashboards - Para CG, Dashboards, Dashboards-Servicio al Cliente y ADMIN -->
+                <!-- DASHBOARDS CON SUBMENÚ -->
+                {% if menu_permisos.dashboard %}
+                <li class="has-submenu">
+                    <a href="{{ url_for('dashboard') }}">
+                        <ion-icon name="bar-chart-outline"></ion-icon>
+                        <span>Dashboards</span>
+                    </a>
+                    
+                    <!-- SUBMENÚ DE DASHBOARDS -->
+                    <ul class="submenu">
+                        <!-- Estado Red Fija -->
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_fija') }}">
+                                <ion-icon name="home-outline"></ion-icon>
+                                <span>Estado Red Fija</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <!-- Estado Red Móvil -->
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_movil') }}">
+                                <ion-icon name="phone-portrait-outline"></ion-icon>
+                                <span>Estado Red Móvil</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <!-- RED BACKHAUL CON SUBMENÚ ANIDADO -->
+                        {% if menu_permisos.dashboard %}
+                        <li class="has-submenu">
+                            <a href="{{ url_for('dash_backhaul') }}">
+                                <ion-icon name="git-network-outline"></ion-icon>
+                                <span>Red Backhaul</span>
+                            </a>
+                            
+                            <!-- SUBMENÚ ANIDADO DE BACKHAUL -->
+                            <ul class="submenu">
+                                <!-- Monitoreo HL5 -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('monitoreo_hl5') }}">
+                                        <ion-icon name="desktop-outline"></ion-icon>
+                                        <span>Monitoreo HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                <!-- Seguimiento HL5 -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('seguimiento_hl5') }}">
+                                        <ion-icon name="search-outline"></ion-icon>
+                                        <span>Seguimiento HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                <!-- Aperturas de Anillos -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('aperturas_anillos') }}">
+                                        <ion-icon name="git-branch-outline"></ion-icon>
+                                        <span>Anillos y Cabeceras</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% endif %}
+                
+                <!-- Servicio al Cliente - Para CG, Servicio al Cliente, Dashboards-Servicio al Cliente y ADMIN -->
+                {% if menu_permisos.servicio_al_cliente %}
+                <li>
+                    <a id="servicio_al_cliente" href="{{ url_for('servicio_al_cliente') }}">
+                        <ion-icon name="globe-outline"></ion-icon>
+                        <span>Mapa de Fallas</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Gobernanza - Solo para CG -->
+                {% if menu_permisos.gobernanza %}
+                <li>
+                    <a href="{{ url_for('gobernanza') }}">
+                        <ion-icon name="shield-checkmark-outline"></ion-icon>
+                        <span>Gobernanza</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Administrar Solicitudes - Solo para ADMIN -->
+                {% if menu_permisos.admin_solicitudes %}
+                <li>
+                    <a href="{{ url_for('admin_solicitudes') }}">
+                        <ion-icon name="person-add-outline"></ion-icon>
+                        <span>Solicitudes</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Gestión de Usuarios - Solo para ADMIN -->
+                {% if menu_permisos.gestion_usuarios %}
+                <li>
+                    <a href="{{ url_for('gestion_usuarios') }}">
+                        <ion-icon name="people-circle-outline"></ion-icon>
+                        <span>Gestión de Usuarios</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        
+        <div>
+            <div class="linea"></div>
+            <div class="usuario">
+                <img src="{{ url_for('static', filename='img/ico_person-circle-outline_blue.svg') }}" alt="Usuario" class="img_user">
+                <div class="info-usuario">
+                    <div class="usuario_red">
+                        {% set usuario_actual = session.get('USUARIO') %}
+                        {% if usuario_actual %}
+                            <span class="usuario_name">{{ usuario_actual }}</span>
+                            {% set perfil_actual = perfil_usuario or session.get('PERFIL', 'Usuario') %}
+                            {% if perfil_actual %}
+                                <small style="font-size: 10px; color: #666; margin-top: 2px; display: block;">{{ perfil_actual }}</small>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <form action="{{ url_for('logout') }}" method="post">
+                        <button id="logoutBtn" class="logout-btn">
+                            <ion-icon name="log-out-outline"></ion-icon>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <div class="seguimiento-container">
+            <h1 class="page-title">Aperturas de Cabeceras y Anillos HL5</h1>
+            <br>
+            <!-- MÃ©tricas superiores -->
+            <div class="metricas-grid">
+                <!-- Cabeceras -->
+                <div class="metrica-card total">
+                    <div class="metrica-label">Total Cabeceras</div>
+                    <div class="metrica-valor cabecera" id="totalCabeceras">0</div>
+                </div>
+                
+                <div class="metrica-card afectacion">
+                    <div class="metrica-label">Cabeceras con Afectación</div>
+                    <div class="metrica-valor" style="color: #dc3545;" id="cabecerasAfectacion">0</div>
+                </div>
+                
+                <div class="metrica-card">
+                    <div class="metrica-label">Distribución Tiempo - Cabeceras</div>
+                    <div class="tiempo-distribucion">
+                        <div class="semi-circulo">
+                            <div class="semi-circulo-grafico">
+                                <div class="semi-circulo-fill green" id="cab4h"></div>
+                            </div>
+                            <div class="semi-circulo-valor" id="cab4hVal">0</div>
+                            <div class="semi-circulo-label">&lt; 4h</div>
+                        </div>
+                        <div class="semi-circulo">
+                            <div class="semi-circulo-grafico">
+                                <div class="semi-circulo-fill yellow" id="cab8h"></div>
+                            </div>
+                            <div class="semi-circulo-valor" id="cab8hVal">0</div>
+                            <div class="semi-circulo-label">8-24h</div>
+                        </div>
+                        <div class="semi-circulo">
+                            <div class="semi-circulo-grafico">
+                                <div class="semi-circulo-fill orange" id="cab24h"></div>
+                            </div>
+                            <div class="semi-circulo-valor" id="cab24hVal">0</div>
+                            <div class="semi-circulo-label">24-48h</div>
+                        </div>
+                        <div class="semi-circulo">
+                            <div class="semi-circulo-grafico">
+                                <div class="semi-circulo-fill red" id="cab2d"></div>
+                            </div>
+                            <div class="semi-circulo-valor" id="cab2dVal">0</div>
+                            <div class="semi-circulo-label">&gt; 2d</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Anillos -->
+                <div class="metrica-card total">
+                    <div class="metrica-label">Total Anillos</div>
+                    <div class="metrica-valor anillo" id="totalAnillos">0</div>
+                </div>
+                
+                <div class="metrica-card afectacion">
+                    <div class="metrica-label">Anillos con Afectación</div>
+                    <div class="metrica-valor" style="color: #dc3545;" id="anillosAfectacion">0</div>
+                </div>
+                
+                <div class="metrica-card">
+                    <div class="metrica-label">Distribución Tiempo - Anillos</div>
+                    <div class="tiempo-distribucion">
+                        <div class="semi-circulo">
+                            <div class="semi-circulo-grafico">
+                                <div class="semi-circulo-fill green" id="ani4h"></div>
+                            </div>
+                            <div class="semi-circulo-valor" id="ani4hVal">0</div>
+                            <div class="semi-circulo-label">&lt; 4h</div>
+                        </div>
+                        <div class="semi-circulo">
+                            <div class="semi-circulo-grafico">
+                                <div class="semi-circulo-fill yellow" id="ani8h"></div>
+                            </div>
+                            <div class="semi-circulo-valor" id="ani8hVal">0</div>
+                            <div class="semi-circulo-label">8-24h</div>
+                        </div>
+                        <div class="semi-circulo">
+                            <div class="semi-circulo-grafico">
+                                <div class="semi-circulo-fill orange" id="ani24h"></div>
+                            </div>
+                            <div class="semi-circulo-valor" id="ani24hVal">0</div>
+                            <div class="semi-circulo-label">24-48h</div>
+                        </div>
+                        <div class="semi-circulo">
+                            <div class="semi-circulo-grafico">
+                                <div class="semi-circulo-fill red" id="ani2d"></div>
+                            </div>
+                            <div class="semi-circulo-valor" id="ani2dVal">0</div>
+                            <div class="semi-circulo-label">&gt; 2d</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mapa único con control de capas -->
+            <div class="mapa-section-unified">
+                <div class="mapa-header-unified">
+                    <span>🗺️ Mapa de Aperturas HL5</span>
+                    <div class="mapa-controles">
+                        <button class="control-capa active" id="toggleCabeceras" onclick="toggleCapa('cabeceras')">
+                            <ion-icon name="business-outline"></ion-icon>
+                            <span>Cabeceras</span>
+                            <span class="contador" id="contadorCabeceras">0 sitios</span>
+                        </button>
+                        <button class="control-capa active" id="toggleAnillos" onclick="toggleCapa('anillos')">
+                            <ion-icon name="radio-outline"></ion-icon>
+                            <span>Anillos</span>
+                            <span class="contador" id="contadorAnillos">0 sitios</span>
+                        </button>
+                        <div class="control-capa active" id="toggleHL5Afectados" onclick="toggleCapa('hl5_afectados')">
+                            <ion-icon name="alert-circle-outline"></ion-icon>
+                            <span>HL5 Afectados</span>
+                            <span class="contador" id="contadorHL5Afectados">0 equipos</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mapa-y-panel">
+                <div class="mapa-wrapper-unified">
+                    <div id="mapaUnificado"></div>
+                    
+                    <!-- Leyenda del mapa -->
+                    <div class="map-legend">
+                        <div style="font-weight: 600; margin-bottom: 8px; color: #2c3e50;">Leyenda</div>
+                        
+                        <div class="legend-item">
+                            <div class="legend-icon-diamond" style="background: #9b59b6;"></div>
+                            <span>Cabecera Normal</span>
+                        </div>
+                        
+                        <div class="legend-item">
+                            <div class="legend-icon-diamond" style="background: #dc3545;"></div>
+                            <span>Cabecera Afectada</span>
+                        </div>
+                        
+                        <div class="legend-item">
+                            <div class="legend-icon" style="background: #007bff;"></div>
+                            <span>Anillo Alarmado</span>
+                        </div>
+                        
+                        <div class="legend-item">
+                            <div class="legend-icon" style="background: #dc3545;"></div>
+                            <span>Anillo Afectado</span>
+                        </div>
+                        
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #007bff;"></div>
+                            <span>Conexión Alarmada</span>
+                        </div>
+                        
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #dc3545;"></div>
+                            <span>Conexión Afectada</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-icon-triangle legend-hl5"></div>
+                            <span>HL5 Alarmado</span>
+                        </div>
+                    </div>
+                </div><!-- fin mapa-wrapper-unified -->
+
+                <!-- Panel lateral: Anillos Afectados -->
+                <div class="panel-anillos" id="panelAnillos">
+                    <div class="panel-anillos-header">
+                        <span>🔴 Anillos Afectados</span>
+                        <span class="panel-anillos-count" id="panelAnillosCount">0</span>
+                    </div>
+                    <div class="panel-anillos-filtros" id="panelAnillosFiltros">
+                        <button class="panel-filtro-btn active" onclick="filtrarPanel('TODOS', this)">Todos</button>
+                        <button class="panel-filtro-btn" onclick="filtrarPanel('CABECERA', this)">Cabecera</button>
+                        <button class="panel-filtro-btn" onclick="filtrarPanel('ANILLO', this)">Anillo</button>
+                        <button class="panel-filtro-btn" onclick="filtrarPanel('HL5', this)">HL5</button>
+                    </div>
+                    <div class="panel-anillos-body" id="panelAnillosBody">
+                        <div class="panel-loading">
+                            <div class="spinner"></div>
+                            Cargando anillos...
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- fin mapa-y-panel -->
+            </div><!-- fin mapa-section-unified -->
+            
+            <!-- Tabla de Detalles -->
+            <div class="tabla-section">
+                <div class="tabla-header">
+                    <span>📋 Detalle Fallas Apertura</span>
+                    <div class="tabla-header-actions">
+                        <span id="totalRegistros">0 registros</span>
+                        <button id="btn-limpiar-filtros" class="btn-limpiar-filtros">
+                            <ion-icon name="close-circle-outline"></ion-icon>
+                            Limpiar Filtros
+                        </button>
+                    </div>
+                </div>
+                <div class="tabla-filtros">
+                    <button class="filtro-btn active" onclick="filtrarTabla('TODOS', event)">Todos</button>
+                    <button class="filtro-btn" onclick="filtrarTabla('CABECERA', event)">Cabeceras</button>
+                    <button class="filtro-btn" onclick="filtrarTabla('ANILLO', event)">Anillos</button>
+                    <button class="filtro-btn" onclick="filtrarTabla('SI', event)">Con Afectación</button>
+                    <button class="filtro-btn" onclick="filtrarTabla('NO', event)">Sin Afectación</button>
+                </div>
+                <div class="tabla-wrapper">
+                    <table id="tablaAperturas">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Hora Inicio
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="HORA_INICIO"></ion-icon>
+                                </th>
+                                <th>
+                                    Tipo
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="TIPO_APERTURA"></ion-icon>
+                                </th>
+                                <th>
+                                    Anillo
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="ANILLO"></ion-icon>
+                                </th>
+                                <th>
+                                    Nodo A
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="NODO_A"></ion-icon>
+                                </th>
+                                <th>
+                                    IP A
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="IP_A"></ion-icon>
+                                </th>
+                                <th>
+                                    Status A
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="NODO_A_STATUS"></ion-icon>
+                                </th>
+                                <th>
+                                    Nodo B
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="NODO_B"></ion-icon>
+                                </th>
+                                <th>
+                                    IP B
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="IP_B"></ion-icon>
+                                </th>
+                                <th>
+                                    Status B
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="NODO_B_STATUS"></ion-icon>
+                                </th>
+                                <th>
+                                    Horas
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="HORAS"></ion-icon>
+                                </th>
+                                <th>
+                                    Afecta
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="AFECTA"></ion-icon>
+                                </th>
+                                <th>
+                                    OT
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="OT"></ion-icon>
+                                </th>
+                                <th>
+                                    Grupo
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="GRUPO_OT"></ion-icon>
+                                </th>
+                                <th>
+                                    Avance
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="AVANCE"></ion-icon>
+                                </th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaBody">
+                            <tr>
+                                <td colspan="15" class="loading">
+                                    <div class="spinner"></div>
+                                    Cargando datos...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Modal de Acciones -->
+                <div id="modalAcciones" class="modal-overlay">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3><ion-icon name="create-outline"></ion-icon> Gestión de OT</h3>
+                            <button class="modal-close" onclick="cerrarModal()">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Información de la apertura -->
+                            <div class="modal-info" id="modalInfo"></div>
+
+                            <!-- Menú de opciones (vista inicial) -->
+                            <div id="menuOpciones" class="modal-actions">
+                                <div class="action-option" onclick="mostrarFormulario('avance')">
+                                    <ion-icon name="document-text-outline"></ion-icon>
+                                    <div class="action-option-content">
+                                        <div class="action-option-title">Insertar Avance</div>
+                                        <div class="action-option-desc">Agregar avance sobre el progreso de la OT</div>
+                                    </div>
+                                </div>
+
+                                <div class="action-option" onclick="mostrarFormulario('cerrar')">
+                                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                                    <div class="action-option-content">
+                                        <div class="action-option-title">Cerrar OT</div>
+                                        <div class="action-option-desc">Marcar la orden de trabajo como completada</div>
+                                    </div>
+                                </div>
+
+                                <div class="action-option" onclick="mostrarFormulario('escalar')">
+                                    <ion-icon name="arrow-up-circle-outline"></ion-icon>
+                                    <div class="action-option-content">
+                                        <div class="action-option-title">Escalar OT</div>
+                                        <div class="action-option-desc">Escalar OT a otro grupo responsable de la revisión</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Formulario de avance -->
+                            <div id="formAvance" style="display: none;">
+                                <form onsubmit="enviarAvance(event)">
+                                    <div class="form-grupo">
+                                        <label class="form-label">Comentario de Avance *</label>
+                                        <textarea class="form-textarea" id="avanceComentario" required 
+                                                placeholder="Describe el avance realizado..."></textarea>
+                                    </div>
+                                    <div class="form-botones">
+                                        <button type="button" class="btn btn-secondary" onclick="volverMenu()">Cancelar</button>
+                                        <button type="submit" class="btn btn-primary">Guardar Avance</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Formulario de cierre -->
+                            <div id="formCerrar" style="display: none;">
+                                <form onsubmit="cerrarOT(event)">
+                                    <div class="form-grupo">
+                                        <label class="form-label">Comentario de Cierre *</label>
+                                        <textarea class="form-textarea" id="cierreComentario" required 
+                                                placeholder="Describe la solución aplicada..."></textarea>
+                                    </div>
+                                    <div class="form-grupo">
+                                        <label class="form-label">Estado Final *</label>
+                                        <select class="form-select" id="cierreEstado" required>
+                                            <option value="">Seleccione...</option>
+                                            <option value="COMP">Completado</option>
+                                            <option value="CLOSE">Cerrado</option>
+                                            <option value="CANCEL">Cancelado</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-botones">
+                                        <button type="button" class="btn btn-secondary" onclick="volverMenu()">Cancelar</button>
+                                        <button type="submit" class="btn btn-success">Cerrar OT</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Formulario de escalamiento -->
+                            <div id="formEscalar" style="display: none;">
+                                <form onsubmit="escalarOT(event)">
+                                    <div class="form-grupo">
+                                        <label class="form-label">Área de Escalamiento *</label>
+                                        <select class="form-select" id="escalarArea" required>
+                                            <option value="">Seleccione...</option>
+                                            <option value="O_CAMBO">Operaciones Campo Bogotá</option>
+                                            <option value="O_CAMBA">Operaciones Campo Caribe</option>
+                                            <option value="O_CAMBU">Operaciones Campo Bucaramanga - Nororiente</option>
+                                            <option value="O_CAMCA">Operaciones Campo Cali - Suroccidente</option>
+                                            <option value="O_CAMCU">Operaciones Campo Cundinamarca</option>
+                                            <option value="O_CAMME">Operaciones Campo Medellín</option>
+                                            <option value="O_CAMPE">Operaciones Campo Pereira - Eje Cafetero</option>
+                                            <option value="O_CAMSO">Operaciones Campo Suroriente</option>
+                                            <option value="O_CAMND">Operaciones Campo Territorios Nacionales</option>
+                                            <option value="O_CAMSA">Operaciones Campo San Andrés</option>
+                                            <option value="O_GESFO">Gestión Fibra Óptica</option>
+                                            <option value="O_GESTRA">Gestión Transmisión</option>
+                                            <option value="O_DXINT">Datos e Internet</option>
+                                            <option value="BACKOFFICE_N1">Backoffice N1</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-grupo">
+                                        <label class="form-label">Motivo de Escalamiento *</label>
+                                        <textarea class="form-textarea" id="escalarMotivo" required 
+                                                placeholder="Explica por qué se debe escalar esta OT..."></textarea>
+                                    </div>
+                                    
+                                    <div class="form-botones">
+                                        <button type="button" class="btn btn-secondary" onclick="volverMenu()">Cancelar</button>
+                                        <button type="submit" class="btn btn-danger">Escalar OT</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- FIN MODAL ACCIONES -->
+            </div>
+        </div>
+  
+    </main>
+
+    <!-- Modal Grafo de Anillo -->
+    <div id="modalGrafoAnillo" class="modal-grafo-overlay">
+        <div class="modal-grafo-content">
+            <div class="modal-grafo-header">
+                <div>
+                    <h3 id="modalGrafoTitulo">Topología del Anillo</h3>
+                    <div id="modalGrafoBadges" style="display:flex; gap:6px; margin-top:6px;"></div>
+                </div>
+                <button class="modal-grafo-close" onclick="cerrarModalGrafo()">&times;</button>
+            </div>
+            <div class="modal-grafo-body">
+                <div class="modal-grafo-stats" id="modalGrafoStats"></div>
+                <div class="modal-grafo-svg-wrapper" id="modalGrafoSvg"></div>
+                <div class="modal-grafo-leyenda">
+                    <div class="grafo-ley-item"><div class="grafo-ley-dot" style="background:#007bff"></div><span>Nodo normal</span></div>
+                    <div class="grafo-ley-item"><div class="grafo-ley-dot" style="background:#dc3545"></div><span>Nodo HL5 afectado</span></div>
+                    <div class="grafo-ley-item"><div class="grafo-ley-line" style="background:#adb5bd"></div><span>Enlace normal</span></div>
+                    <div class="grafo-ley-item"><div class="grafo-ley-line" style="background:#dc3545"></div><span>Enlace afectado</span></div>
+                </div>
+                <div class="modal-grafo-tabla" id="modalGrafoTabla"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Filtro -->
+    <div id="filter-modal" class="filter-modal">
+        <div class="filter-modal-content">
+            <div class="filter-modal-header">
+                <span class="filter-modal-title">Filtrar por valores:</span>
+                <span class="filter-modal-close">&times;</span>
+            </div>
+            <div class="filter-modal-body">
+                <div class="filter-search-box">
+                    <ion-icon name="search-outline"></ion-icon>
+                    <input type="text" id="filter-search-input" placeholder="Filtrar valores">
+                </div>
+                <div class="filter-bulk-actions">
+                    <button type="button" id="filter-select-all" class="filter-bulk-btn">Seleccionar todo</button>
+                    <button type="button" id="filter-clear" class="filter-bulk-btn secondary">Limpiar selección</button>
+                </div>
+                <div class="filter-options-container" id="filter-options-container">
+                    <!-- Opciones dinámicas -->
+                </div>
+            </div>
+            <div class="filter-modal-footer">
+                <button class="filter-btn-ok" id="filter-btn-ok">Ok</button>
+                <button class="filter-btn-cancel" id="filter-btn-cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts externos -->
+<script src="{{ url_for('static', filename='js/template.js') }}"></script>
+<script src="{{ url_for('static', filename='js/template_submenu.js') }}"></script>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Script principal de aperturas anillos -->
+<script src="{{ url_for('static', filename='js/aperturas_anillos.js') }}"></script>
+</body>
+</html>

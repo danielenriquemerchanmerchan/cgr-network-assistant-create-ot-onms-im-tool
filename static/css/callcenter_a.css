@@ -1,0 +1,82 @@
+:root{
+    --color-barra-lateral: rgb(255,255,255);
+    --color-texto: #0166ff;
+    --color-texto-menu: #0b283a;
+    --color-boton: #0166ff;
+    --color-boton-texto: rgb(255,255,255);
+    --color-menu-hover: rgb(238,238,238);
+    --color-menu-hover-texto: #0166ff;
+    --color-linea:rgb(241,241,241);
+    --color-scroll: #0166ff;
+    --color-scroll-hover: rgb(1, 158, 244);
+}
+
+#callcenter{
+    background-color: var(--color-menu-hover);
+    color: var(--color-menu-hover-texto);
+}
+
+*{
+    font-family: 'Roboto', sans-serif;
+}
+
+/* ******* FORMATO FORMULARIO ********** */
+.form-call{
+    margin-bottom: 20px;
+}
+.formulario .form-text{
+    width: 100px;
+    height: 30px;
+}
+
+.formulario .form-text input{
+    width: 250px;
+    height: 30px;
+    border-radius: 10px;
+    text-align: center;
+    border: none;
+    color: var(--color-menu-hover-texto);
+    outline: none; /* Elimina el borde de enfoque por defecto */
+    transition: border-color 0.3s; /* Animación suave para el cambio de color */
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.formulario .form-boton .boton-consultar{
+    width: 250px;
+    height: 30px;
+    border-radius: 10px;
+    background-color: var(--color-boton);
+    color: var(--color-boton-texto);
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.linea-call{
+    margin-top: 20px;
+    width: 100%;
+    height: 1px;
+    background-color: var(--color-barra-lateral);
+}
+
+/* ******* FORMATO TABLA ********** */
+.tabla_resultado{
+    text-align: center;
+
+}
+.tabla{
+    width: 100%;
+    font-size: 14px;
+}
+
+.tabla_resultado .tabla thead{
+    background-color: var(--color-boton);
+    color: var(--color-boton-texto);
+    height: 25px;
+}
+
+.tabla_resultado .tabla tbody tr{
+    height: 22px;
+}

@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/logo_ico.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template_submenu.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/onms.css') }}">
+    <title>smartsoc | ONMS — Cortes Fibra Óptica</title>
+</head>
+<body>
+    <div class="menu">
+        <ion-icon name="menu-outline"></ion-icon>
+        <ion-icon name="close-outline"></ion-icon>
+    </div>
+
+    <!-- ===== BARRA LATERAL ===== -->
+    <div class="barra-lateral">
+        <div>
+            <div class="nombre-pagina">
+                <img id="icon-logo" class="ico-logo" src="{{ url_for('static', filename='img/logo.png') }}"/>
+                <img class="logo" src="{{ url_for('static', filename='img/nombre_logo.png') }}"/>
+            </div>
+            <div class="linea"></div>
+            <br>
+        </div>
+
+        <nav class="navegacion">
+            <ul>
+                {% if menu_permisos.home %}
+                <li>
+                    <a href="{{ url_for('home') }}">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span>Home</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.callcenter %}
+                <li>
+                    <a href="{{ url_for('consultar_callcenter') }}">
+                        <ion-icon name="people-outline"></ion-icon>
+                        <span>Callcenter</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.callcenter_abonados %}
+                <li>
+                    <a href="{{ url_for('callcenter_abonados') }}">
+                        <ion-icon name="accessibility-outline"></ion-icon>
+                        <span>Abonados</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.n1 %}
+                <li>
+                    <a href="{{ url_for('n1') }}">
+                        <ion-icon name="speedometer-outline"></ion-icon>
+                        <span>Monitoreo N1</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.trabajos_programados %}
+                <li>
+                    <a href="{{ url_for('route_trabajos_programados') }}">
+                        <ion-icon name="calendar-outline"></ion-icon>
+                        <span>Trabajos Programados</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.dashboard %}
+                <li class="has-submenu">
+                    <a href="{{ url_for('dashboard') }}">
+                        <ion-icon name="bar-chart-outline"></ion-icon>
+                        <span>Dashboards</span>
+                    </a>
+                    <ul class="submenu">
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_fija') }}">
+                                <ion-icon name="home-outline"></ion-icon>
+                                <span>Estado Red Fija</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_movil') }}">
+                                <ion-icon name="phone-portrait-outline"></ion-icon>
+                                <span>Estado Red Móvil</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% if menu_permisos.dashboard %}
+                        <li class="has-submenu">
+                            <a href="{{ url_for('dash_backhaul') }}">
+                                <ion-icon name="git-network-outline"></ion-icon>
+                                <span>Red Backhaul</span>
+                            </a>
+                            <ul class="submenu">
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('monitoreo_hl5') }}">
+                                        <ion-icon name="desktop-outline"></ion-icon>
+                                        <span>Monitoreo HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('seguimiento_hl5') }}">
+                                        <ion-icon name="search-outline"></ion-icon>
+                                        <span>Seguimiento HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('aperturas_anillos') }}">
+                                        <ion-icon name="git-branch-outline"></ion-icon>
+                                        <span>Anillos y Cabeceras</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.onms %}
+                <li>
+                    <a href="{{ url_for('onms') }}">
+                        <ion-icon name="git-merge-outline"></ion-icon>
+                        <span>ONMS</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.servicio_al_cliente %}
+                <li>
+                    <a href="{{ url_for('servicio_al_cliente') }}">
+                        <ion-icon name="globe-outline"></ion-icon>
+                        <span>Mapa de Fallas</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.gobernanza %}
+                <li>
+                    <a href="{{ url_for('gobernanza') }}">
+                        <ion-icon name="shield-checkmark-outline"></ion-icon>
+                        <span>Gobernanza</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.admin_solicitudes %}
+                <li>
+                    <a href="{{ url_for('admin_solicitudes') }}">
+                        <ion-icon name="person-add-outline"></ion-icon>
+                        <span>Solicitudes</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.gestion_usuarios %}
+                <li>
+                    <a href="{{ url_for('gestion_usuarios') }}">
+                        <ion-icon name="people-circle-outline"></ion-icon>
+                        <span>Gestión de Usuarios</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <div>
+            <div class="linea"></div>
+            <div class="usuario">
+                <img src="{{ url_for('static', filename='img/ico_person-circle-outline_blue.svg') }}" alt="" class="img_user">
+                <div class="info-usuario">
+                    <div class="usuario_red">
+                        <span class="usuario_name">{{ session['USUARIO'] }}</span>
+                        {% if perfil_usuario %}
+                        <small style="font-size: 10px; color: #666; margin-top: 2px; display: block;">{{ perfil_usuario }}</small>
+                        {% endif %}
+                    </div>
+                    <form id="logoutForm" action="{{ url_for('logout') }}" method="post">
+                        <button id="logoutBtn" class="logout-btn">
+                            <ion-icon name="log-out-outline"></ion-icon>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN ===== -->
+    <main>
+        <div class="onms-container">
+
+            <!-- Encabezado de página -->
+            <div class="page-header">
+                <div class="page-title">
+                    <ion-icon name="git-branch-outline"></ion-icon>
+                    <span>ONMS — Monitoreo de Cortes Fibra Óptica</span>
+                    <span class="badge-live-onms">● EN VIVO</span>
+                </div>
+                <div class="page-header-actions">
+                    <span class="ultima-actualizacion">
+                        Actualizado: <span id="onmsUltimaAct">--:--:--</span>
+                    </span>
+                    <div class="actualizacion-info">
+                        <span class="countdown-label">Próx. actualización en <span id="onmsCountdown">--</span>s</span>
+                        <button class="btn-pausa-refresh" id="btnPausaRefresh" onclick="onmsTogglePausa()" title="Pausar actualización automática">
+                            <ion-icon name="pause-outline" id="iconPausaRefresh"></ion-icon>
+                        </button>
+                    </div>
+                    <button class="btn-refresh" id="btnRefreshOnms" onclick="onmsRefrescar()">
+                        <ion-icon name="refresh-outline"></ion-icon>
+                        Actualizar
+                    </button>
+                    <button class="btn-nueva-solicitud" onclick="onmsAbrirModalSolicitud()">
+                        <ion-icon name="add-circle-outline"></ion-icon>
+                        Nueva Solicitud
+                    </button>
+                </div>
+            </div>
+
+            <!-- ===== TARJETAS KPI ===== -->
+            <div class="onms-kpi-row">
+                <!-- Total incidentes -->
+                <div class="onms-kpi-card">
+                    <div class="onms-kpi-icon onms-kpi-icon-info">
+                        <ion-icon name="list-outline"></ion-icon>
+                    </div>
+                    <div class="onms-kpi-info">
+                        <span class="onms-kpi-valor" id="kpiTotal">28</span>
+                        <span class="onms-kpi-label">Total incidentes</span>
+                        <span class="onms-kpi-sub onms-sub-info">activos hoy</span>
+                    </div>
+                </div>
+
+                <!-- Con afectación -->
+                <div class="onms-kpi-card onms-kpi-card-coral">
+                    <div class="onms-kpi-acento"></div>
+                    <div class="onms-kpi-icon onms-kpi-icon-coral">
+                        <ion-icon name="warning-outline"></ion-icon>
+                    </div>
+                    <div class="onms-kpi-info">
+                        <span class="onms-kpi-valor onms-val-coral" id="kpiAfecta">14</span>
+                        <span class="onms-kpi-label">Con afectación</span>
+                        <span class="onms-kpi-sub onms-sub-coral">impactan servicio</span>
+                    </div>
+                </div>
+
+                <!-- Por Asignar -->
+                <div class="onms-kpi-card">
+                    <div class="onms-kpi-icon onms-kpi-icon-warning">
+                        <ion-icon name="alert-circle-outline"></ion-icon>
+                    </div>
+                    <div class="onms-kpi-info">
+                        <span class="onms-kpi-valor onms-val-warning" id="kpiNuevas">5</span>
+                        <span class="onms-kpi-label">Por Asignar</span>
+                        <span class="onms-kpi-sub onms-sub-warning">pendientes cuadrilla</span>
+                    </div>
+                </div>
+
+                <!-- En atención -->
+                <div class="onms-kpi-card">
+                    <div class="onms-kpi-icon onms-kpi-icon-blue">
+                        <ion-icon name="construct-outline"></ion-icon>
+                    </div>
+                    <div class="onms-kpi-info">
+                        <span class="onms-kpi-valor onms-val-blue" id="kpiAtencion">16</span>
+                        <span class="onms-kpi-label">En atención</span>
+                        <span class="onms-kpi-sub onms-sub-blue">cuadrillas desplegadas</span>
+                    </div>
+                </div>
+
+                <!-- Pend. confirmación -->
+                <div class="onms-kpi-card">
+                    <div class="onms-kpi-icon onms-kpi-icon-purple">
+                        <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    </div>
+                    <div class="onms-kpi-info">
+                        <span class="onms-kpi-valor onms-val-purple" id="kpiPendConf">4</span>
+                        <span class="onms-kpi-label">Validación</span>
+                        <span class="onms-kpi-sub">listas para confirmar</span>
+                    </div>
+                </div>
+
+                <!-- Sin avance +30 min -->
+                <div class="onms-kpi-card">
+                    <div class="onms-kpi-icon onms-kpi-icon-danger">
+                        <ion-icon name="timer-outline"></ion-icon>
+                    </div>
+                    <div class="onms-kpi-info">
+                        <span class="onms-kpi-valor onms-val-danger" id="kpiSinAvance">3</span>
+                        <span class="onms-kpi-label">Sin avance +30 min</span>
+                        <span class="onms-kpi-sub onms-sub-danger">requieren acción</span>
+                    </div>
+                </div>
+
+                <!-- Cerrados hoy -->
+                <div class="onms-kpi-card">
+                    <div class="onms-kpi-icon onms-kpi-icon-success">
+                        <ion-icon name="checkmark-done-outline"></ion-icon>
+                    </div>
+                    <div class="onms-kpi-info">
+                        <span class="onms-kpi-valor onms-val-success" id="kpiCerrados">12</span>
+                        <span class="onms-kpi-label">Cerrados hoy</span>
+                        <span class="onms-kpi-sub onms-sub-success">completados</span>
+                    </div>
+                </div>
+
+                <!-- Parada de Reloj -->
+                <div class="onms-kpi-card onms-kpi-card-pdr">
+                    <div class="onms-kpi-acento onms-kpi-acento-pdr"></div>
+                    <div class="onms-kpi-icon onms-kpi-icon-pdr">
+                        <ion-icon name="pause-circle-outline"></ion-icon>
+                    </div>
+                    <div class="onms-kpi-info">
+                        <span class="onms-kpi-valor onms-val-pdr" id="kpiPDR">0</span>
+                        <span class="onms-kpi-label">Parada de reloj</span>
+                        <span class="onms-kpi-sub onms-sub-pdr">labores suspendidas</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== TARJETAS KPI — TIPO DE TRAMO ===== -->
+            <div class="onms-kpi-row onms-kpi-row-tramo">
+                <div class="onms-kpi-tramo-header">
+                    <ion-icon name="git-network-outline"></ion-icon>
+                    Cortes por tipo de tramo
+                </div>
+                <div class="onms-kpi-card onms-kpi-card-tramo" style="border-left:3px solid #0369a1;">
+                    <div class="onms-kpi-info">
+                        <span class="onms-kpi-valor" id="kpiRLFO" style="color:#0369a1;font-size:28px;">0</span>
+                        <span class="onms-badge-tramo" style="margin-top:4px;">RLFO</span>
+                        <span class="onms-kpi-sub" style="margin-top:3px;">Red Local FO</span>
+                    </div>
+                </div>
+                <div class="onms-kpi-card onms-kpi-card-tramo" style="border-left:3px solid #7c3aed;">
+                    <div class="onms-kpi-info">
+                        <span class="onms-kpi-valor" id="kpiRTNFO" style="color:#7c3aed;font-size:28px;">0</span>
+                        <span class="onms-badge-tramo" style="margin-top:4px;background:#ede9fe;color:#5b21b6;border-color:#c4b5fd;">RTNFO</span>
+                        <span class="onms-kpi-sub" style="margin-top:3px;">Red Transporte Nacional FO</span>
+                    </div>
+                </div>
+                <div class="onms-kpi-card onms-kpi-card-tramo" style="border-left:3px solid #0f766e;">
+                    <div class="onms-kpi-info">
+                        <span class="onms-kpi-valor" id="kpiRDFO" style="color:#0f766e;font-size:28px;">0</span>
+                        <span class="onms-badge-tramo" style="margin-top:4px;background:#ccfbf1;color:#134e4a;border-color:#5eead4;">RDFO</span>
+                        <span class="onms-kpi-sub" style="margin-top:3px;">Red Distribución FO</span>
+                    </div>
+                </div>
+                <div class="onms-kpi-card onms-kpi-card-tramo" style="border-left:3px solid #b45309;">
+                    <div class="onms-kpi-info">
+                        <span class="onms-kpi-valor" id="kpiRBHFO" style="color:#b45309;font-size:28px;">0</span>
+                        <span class="onms-badge-tramo" style="margin-top:4px;background:#fef3c7;color:#92400e;border-color:#fde68a;">RBHFO</span>
+                        <span class="onms-kpi-sub" style="margin-top:3px;">Red Backhaul FO</span>
+                    </div>
+                </div>
+                <div class="onms-kpi-card onms-kpi-card-tramo" style="border-left:3px solid #94a3b8;">
+                    <div class="onms-kpi-info">
+                        <span class="onms-kpi-valor" id="kpiSinTipo" style="color:#64748b;font-size:28px;">0</span>
+                        <span class="onms-badge-tramo" style="margin-top:4px;background:#f1f5f9;color:#475569;border-color:#94a3b8;">Sin tipo</span>
+                        <span class="onms-kpi-sub" style="margin-top:3px;">No clasificados</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== MÓDULO SOLICITUD ===== -->
+            <div class="seccion-card">
+                <div class="seccion-header onms-header-fo">
+                    <div class="seccion-titulo">
+                        <ion-icon name="add-circle-outline"></ion-icon>
+                        Solicitud de atención — Nuevo corte FO
+                    </div>
+                    <span class="onms-header-sub">Validación de OT automática</span>
+                </div>
+
+                <div class="onms-form-row">
+                    <div class="onms-field">
+                        <label class="onms-label">Nodo A (origen)</label>
+                        <select class="onms-select" id="onmsNodoA" onchange="onmsUpdateTramo()">
+                            <option value="">Seleccionar nodo...</option>
+                            <option>MEDELLÍN HUB</option>
+                            <option>BELLO N1</option>
+                            <option>ITAGÜÍ N2</option>
+                            <option>SABANETA N3</option>
+                            <option>ENVIGADO N2</option>
+                            <option>BOGOTÁ HUB</option>
+                            <option>BUCARAMANGA A</option>
+                        </select>
+                    </div>
+                    <div class="onms-field">
+                        <label class="onms-label">Nodo B (destino)</label>
+                        <select class="onms-select" id="onmsNodoB" onchange="onmsUpdateTramo()">
+                            <option value="">Seleccionar nodo...</option>
+                            <option>BELLO N1</option>
+                            <option>COPACABANA N2</option>
+                            <option>ITAGÜÍ N2</option>
+                            <option>CALDAS N3</option>
+                            <option>SABANETA N3</option>
+                            <option>FLORIDABLANCA B</option>
+                            <option>GIRÓN N1</option>
+                        </select>
+                    </div>
+                    <div class="onms-field">
+                        <label class="onms-label">Tramo identificado</label>
+                        <div class="onms-tramo-preview" id="onmsTramoPreview">Seleccione nodos A y B</div>
+                    </div>
+                    <div class="onms-field">
+                        <label class="onms-label">Tipo de tramo</label>
+                        <select class="onms-select" id="onmsTipoTramo">
+                            <option value="">Seleccionar...</option>
+                            <option value="RLFO">RLFO</option>
+                            <option value="RTNFO">RTNFO</option>
+                            <option value="RDFO">RDFO</option>
+                            <option value="RBHFO">RBHFO</option>
+                        </select>
+                    </div>
+                    <div class="onms-field">
+                        <label class="onms-label">Afectación</label>
+                        <select class="onms-select" id="onmsAfectacion">
+                            <option value="SI">Afecta servicio</option>
+                            <option value="NO">Sin afectación</option>
+                        </select>
+                    </div>
+                    <button class="btn-validar-ot" onclick="onmsValidarOT()">
+                        <ion-icon name="search-outline"></ion-icon>
+                        Validar OT
+                    </button>
+                </div>
+
+                <!-- Fila de observaciones -->
+                <div class="onms-obs-row">
+                    <div class="onms-field onms-field-obs">
+                        <label class="onms-label">
+                            <ion-icon name="create-outline" style="font-size:13px;vertical-align:middle;margin-right:3px;"></ion-icon>
+                            Observaciones de la solicitud
+                        </label>
+                        <textarea class="onms-textarea-obs" id="onmsObservaciones" rows="3"
+                            placeholder="Describa las razones de la solicitud, condiciones del sitio, síntomas observados u otra información relevante para la atención..."></textarea>
+                    </div>
+                </div>
+
+                <div class="onms-ot-resultado" id="onmsOtResultado" style="display:none;"></div>
+
+                <!-- Leyenda de estados -->
+                <div class="onms-leyenda">
+                    <span class="onms-leyenda-titulo">Etapas:</span>
+                    <span class="onms-badge onms-badge-nueva">Por Asignar</span>
+                    <span class="onms-badge onms-badge-asignado">Corte Asignado</span>
+                    <span class="onms-badge onms-badge-desp">Desplazamiento</span>
+                    <span class="onms-badge onms-badge-ensitio">En Sitio</span>
+                    <span class="onms-badge onms-badge-medida">Medida</span>
+                    <span class="onms-badge onms-badge-busqueda">Búsqueda</span>
+                    <span class="onms-badge onms-badge-hallazgo">Hallazgo</span>
+                    <span class="onms-badge onms-badge-diag">Diagnóstico</span>
+                    <span class="onms-badge onms-badge-ejecucion">Ejecución/Reparación</span>
+                    <span class="onms-badge onms-badge-emp">Empalmería</span>
+                    <span class="onms-badge onms-badge-validacion">Validación</span>
+                    <span class="onms-badge onms-badge-retiro">Retiro</span>
+                    <span class="onms-leyenda-sep">|</span>
+                    <span class="onms-leyenda-titulo">Afectación:</span>
+                    <span class="onms-badge onms-badge-afecta">Afecta servicio</span>
+                    <span class="onms-badge onms-badge-sinafecta">Sin afectación</span>
+                </div>
+            </div>
+
+            <!-- ===== TABLA INCIDENTES ACTIVOS ===== -->
+            <div class="seccion-card">
+                <div class="seccion-header onms-header-tabla">
+                    <div class="seccion-titulo">
+                        <ion-icon name="list-outline"></ion-icon>
+                        Incidentes activos
+                        <span class="badge-contador" id="badgeContadorTabla">0</span>
+                    </div>
+                    <div class="seccion-actions">
+                        <span class="registros-label" id="onmsRegistrosLabel">0 registros</span>
+                        <select class="onms-select-filtro" id="filtroEstado" onchange="onmsFiltrar()">
+                            <option value="">Todos los estados</option>
+                            <option value="Por Asignar">Por Asignar</option>
+                            <option value="Corte Asignado">Corte Asignado</option>
+                            <option value="Desplazamiento">Desplazamiento</option>
+                            <option value="Medida">Medida</option>
+                            <option value="Búsqueda">Búsqueda</option>
+                            <option value="Hallazgo">Hallazgo</option>
+                            <option value="Diagnóstico">Diagnóstico</option>
+                            <option value="Ejecución/Reparación">Ejecución/Reparación</option>
+                            <option value="Empalmería">Empalmería</option>
+                            <option value="Validación">Validación</option>
+                            <option value="Retiro">Retiro</option>
+                        </select>
+                        <select class="onms-select-filtro" id="filtroAfectacion" onchange="onmsFiltrar()">
+                            <option value="">Toda afectación</option>
+                            <option value="SI">Afecta servicio</option>
+                            <option value="NO">Sin afectación</option>
+                        </select>
+                        <select class="onms-select-filtro" id="filtroTipoTramo" onchange="onmsFiltrar()">
+                            <option value="">Todo tipo tramo</option>
+                            <option value="RLFO">RLFO</option>
+                            <option value="RTNFO">RTNFO</option>
+                            <option value="RDFO">RDFO</option>
+                            <option value="RBHFO">RBHFO</option>
+                        </select>
+                        <select class="onms-select-filtro" id="filtroOperadorFo" onchange="onmsFiltrar()">
+                            <option value="">Todo operador FO</option>
+                        </select>
+                        <select class="onms-select-filtro" id="filtroEecc" onchange="onmsFiltrar()">
+                            <option value="">Todo EECC</option>
+                        </select>
+                        <div class="onms-filtro-ot">
+                            <ion-icon name="search-outline"></ion-icon>
+                            <input type="text" class="onms-input-filtro-ot" id="filtroOt"
+                                placeholder="Buscar OT..." oninput="onmsFiltrar()">
+                        </div>
+                        <button class="btn-refresh btn-sm-onms" onclick="onmsLimpiarFiltros()">
+                            <ion-icon name="close-circle-outline"></ion-icon>
+                            Limpiar filtros
+                        </button>
+                    </div>
+                </div>
+
+                <div class="onms-tabla-wrap">
+                    <table class="onms-tabla" id="onmsTabla">
+                        <thead>
+                            <tr>
+                                <th>OT</th>
+                                <th>Afectación</th>
+                                <th>Nodo A</th>
+                                <th>Nodo B</th>
+                                <th>Municipio</th>
+                                <th>Inicio</th>
+                                <th>Estado / Etapa</th>
+                                <th>Parada reloj</th>
+                                <th>Tipo tramo</th>
+                                <th>Operador FO</th>
+                                <th>EECC</th>
+                                <th>Cuadrilla</th>
+                                <th>Últ. avance</th>
+                                <th>T. sin avance</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="onmsTbody">
+                            <!-- Filas generadas por JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /onms-container -->
+    </main>
+
+    <!-- ===== MODAL AVANCE ===== -->
+    <div id="onmsModalAvance" class="onms-modal-overlay" style="display:none;">
+        <div class="onms-modal-content">
+            <div class="onms-modal-header">
+                <span class="onms-modal-titulo">
+                    <ion-icon name="create-outline"></ion-icon>
+                    Registrar Avance
+                </span>
+                <button class="onms-modal-cerrar" onclick="onmsCerrarModal('onmsModalAvance')">
+                    <ion-icon name="close-outline"></ion-icon>
+                </button>
+            </div>
+            <div class="onms-modal-body">
+                <input type="hidden" id="avanceOtId">
+                <div class="form-grupo">
+                    <label class="form-label">OT: <strong id="avanceOtLabel"></strong></label>
+                </div>
+                <div class="form-grupo">
+                    <label class="form-label">Etapa actual *</label>
+                    <select class="form-select" id="avanceEtapa" required>
+                        <option value="">Seleccione etapa...</option>
+                        <option value="Corte Asignado">Corte Asignado</option>
+                        <option value="Desplazamiento">Desplazamiento</option>
+                        <option value="En Sitio">En Sitio</option>
+                        <option value="Medida">Medida</option>
+                        <option value="Búsqueda">Búsqueda</option>
+                        <option value="Hallazgo">Hallazgo</option>
+                        <option value="Diagnóstico">Diagnóstico</option>
+                        <option value="Ejecución/Reparación">Ejecución/Reparación</option>
+                        <option value="Empalmería">Empalmería</option>
+                        <option value="Validación">Validación</option>
+                        <option value="Retiro">Retiro</option>
+                    </select>
+                </div>
+                <div class="form-grupo">
+                    <label class="form-label">Comentario de avance *</label>
+                    <textarea class="form-textarea" id="avanceComentario" rows="4"
+                        placeholder="Describe el avance realizado en campo..."></textarea>
+                </div>
+            </div>
+            <div class="onms-modal-footer">
+                <button class="btn btn-secondary" onclick="onmsCerrarModal('onmsModalAvance')">Cancelar</button>
+                <button class="btn btn-primary" onclick="onmsGuardarAvance()">
+                    <ion-icon name="save-outline"></ion-icon>
+                    Guardar avance
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL ASIGNAR CUADRILLA ===== -->
+    <div id="onmsModalAsignar" class="onms-modal-overlay" style="display:none;">
+        <div class="onms-modal-content">
+            <div class="onms-modal-header">
+                <span class="onms-modal-titulo">
+                    <ion-icon name="people-outline"></ion-icon>
+                    Asignar Cuadrilla
+                </span>
+                <button class="onms-modal-cerrar" onclick="onmsCerrarModal('onmsModalAsignar')">
+                    <ion-icon name="close-outline"></ion-icon>
+                </button>
+            </div>
+            <div class="onms-modal-body">
+                <input type="hidden" id="asignarOtId">
+                <div class="form-grupo">
+                    <label class="form-label">OT: <strong id="asignarOtLabel"></strong></label>
+                </div>
+                <div class="form-grupo">
+                    <label class="form-label">Contratista *</label>
+                    <select class="form-select" id="asignarContratista" required>
+                        <option value="">Seleccione contratista...</option>
+                        <option>Dominion</option>
+                        <option>Colavinni</option>
+                        <option>Liteyca</option>
+                        <option>Cobra</option>
+                        <option>Incopsa</option>
+                        <option>Optecom</option>
+                        <option>Comfica Cundinamarca</option>
+                        <option>Opegin</option>
+                        <option>Comfica</option>
+                        <option>Inmel</option>
+                    </select>
+                </div>
+                <div class="form-grupo">
+                    <label class="form-label">Cuadrilla *</label>
+                    <select class="form-select" id="asignarCuadrilla" required>
+                        <option value="">Seleccione cuadrilla...</option>
+                        <option>CUA-FO-01</option>
+                        <option>CUA-FO-02</option>
+                        <option>CUA-FO-03</option>
+                        <option>CUA-FO-04</option>
+                        <option>CUA-FO-05</option>
+                        <option>CUA-FO-06</option>
+                        <option>CUA-FO-07</option>
+                        <option>CUA-FO-08</option>
+                        <option>CUA-FO-09</option>
+                        <option>CUA-FO-10</option>
+                        <option>CUA-FO-11</option>
+                        <option>CUA-FO-12</option>
+                    </select>
+                </div>
+                <div class="form-grupo">
+                    <label class="form-label">Observación</label>
+                    <textarea class="form-textarea" id="asignarObs" rows="3"
+                        placeholder="Instrucciones o notas para la cuadrilla..."></textarea>
+                </div>
+            </div>
+            <div class="onms-modal-footer">
+                <button class="btn btn-secondary" onclick="onmsCerrarModal('onmsModalAsignar')">Cancelar</button>
+                <button class="btn btn-primary" onclick="onmsGuardarAsignacion()">
+                    <ion-icon name="checkmark-outline"></ion-icon>
+                    Asignar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL CONFIRMAR CIERRE ===== -->
+    <div id="onmsModalConfirmar" class="onms-modal-overlay" style="display:none;">
+        <div class="onms-modal-content">
+            <div class="onms-modal-header">
+                <span class="onms-modal-titulo">
+                    <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+                    Confirmar cierre
+                </span>
+                <button class="onms-modal-cerrar" onclick="onmsCerrarModal('onmsModalConfirmar')">
+                    <ion-icon name="close-outline"></ion-icon>
+                </button>
+            </div>
+            <div class="onms-modal-body">
+                <input type="hidden" id="confirmarOtId">
+                <div class="form-grupo">
+                    <label class="form-label">OT: <strong id="confirmarOtLabel"></strong></label>
+                </div>
+                <div class="form-grupo">
+                    <label class="form-label">¿Confirma el restablecimiento del servicio en este tramo?</label>
+                </div>
+                <div class="form-grupo">
+                    <label class="form-label">Comentario de cierre *</label>
+                    <textarea class="form-textarea" id="confirmarComentario" rows="3"
+                        placeholder="Describe la solución aplicada..."></textarea>
+                </div>
+            </div>
+            <div class="onms-modal-footer">
+                <button class="btn btn-secondary" onclick="onmsCerrarModal('onmsModalConfirmar')">Cancelar</button>
+                <button class="btn btn-success" onclick="onmsGuardarConfirmacion()">
+                    <ion-icon name="checkmark-done-outline"></ion-icon>
+                    Confirmar cierre
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== POPOVER COMENTARIO AVANCE ===== -->
+    <div id="onmsPopoverAvance" class="onms-modal-overlay" style="display:none;">
+        <div class="onms-popover-content">
+            <div class="onms-popover-header">
+                <span class="onms-modal-titulo">
+                    <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+                    Último avance registrado
+                </span>
+                <button class="onms-modal-cerrar" onclick="document.getElementById('onmsPopoverAvance').style.display='none'">
+                    <ion-icon name="close-outline"></ion-icon>
+                </button>
+            </div>
+            <div class="onms-popover-body">
+                <div class="onms-popover-hora">
+                    <ion-icon name="time-outline"></ion-icon>
+                    <span id="popoverHora"></span>
+                </div>
+                <p id="popoverTitulo" class="onms-popover-titulo"></p>
+                <p id="popoverTexto" class="onms-popover-texto"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL FIN PARADA DE RELOJ ===== -->
+    <div id="onmsModalFinPR" class="onms-modal-overlay" style="display:none;">
+        <div class="onms-modal-content">
+            <div class="onms-modal-header onms-modal-header-pdr">
+                <span class="onms-modal-titulo">
+                    <ion-icon name="play-circle-outline"></ion-icon>
+                    Fin Parada de Reloj
+                </span>
+                <button class="onms-modal-cerrar" onclick="onmsCerrarModal('onmsModalFinPR')">
+                    <ion-icon name="close-outline"></ion-icon>
+                </button>
+            </div>
+            <div class="onms-modal-body">
+                <input type="hidden" id="finPrOtId">
+                <div class="form-grupo">
+                    <label class="form-label">OT: <strong id="finPrOtLabel"></strong></label>
+                </div>
+                <div class="onms-finpr-aviso">
+                    <ion-icon name="information-circle-outline"></ion-icon>
+                    <span>Al confirmar, se registra el fin de la parada de reloj y se reactivan las labores de campo. El reloj de seguimiento se reiniciará.</span>
+                </div>
+                <div class="form-grupo">
+                    <label class="form-label">Motivo de reactivación *</label>
+                    <textarea class="form-textarea" id="finPrComentario" rows="4"
+                        placeholder="Describa la causa que originó la parada, la solución tomada y las condiciones actuales para reactivar labores..."></textarea>
+                </div>
+            </div>
+            <div class="onms-modal-footer">
+                <button class="btn btn-secondary" onclick="onmsCerrarModal('onmsModalFinPR')">Cancelar</button>
+                <button class="btn btn-finpr" onclick="onmsGuardarFinPR()">
+                    <ion-icon name="play-outline"></ion-icon>
+                    Reactivar labores
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notificaciones -->
+    <div id="onmsToast" class="onms-toast" style="display:none;"></div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/template.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/template_submenu.js') }}"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="{{ url_for('static', filename='js/onms.js') }}"></script>
+
+    <script>
+        /* ---- Gestión de Sesión ---- */
+        const SESION_PERMANENTE = {{ session.get('SESION_PERMANENTE', 0) | int }};
+        const TIMEOUT_INACTIVIDAD_MS = 30 * 60 * 1000;
+        const PING_INTERVAL_MS = 10 * 60 * 1000;
+        let inactividadTimer = null;
+
+        function pingServidor() {
+            fetch('/ping_session', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+                .catch(() => {});
+        }
+        setInterval(pingServidor, PING_INTERVAL_MS);
+
+        if (!SESION_PERMANENTE) {
+            function logoutDueToInactivity() {
+                alert("Has sido desconectado por inactividad (30 min).");
+                document.querySelector('form[action*="logout"]').submit();
+            }
+            function resetTimeout() {
+                clearTimeout(inactividadTimer);
+                inactividadTimer = setTimeout(logoutDueToInactivity, TIMEOUT_INACTIVIDAD_MS);
+            }
+            window.addEventListener('load', resetTimeout);
+            document.addEventListener('mousemove', resetTimeout);
+            document.addEventListener('keydown', resetTimeout);
+            document.addEventListener('click', resetTimeout);
+            document.addEventListener('scroll', resetTimeout);
+        }
+    </script>
+</body>
+</html>

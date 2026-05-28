@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/logo_ico.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gestion_usuarios.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template_submenu.css') }}">
+    <title>smartsoc | Gestión de Usuarios</title>
+    <style>
+        /* ============================================
+           TABLA: HEADERS Y FILTROS
+           ============================================ */
+        .tabla-usuarios thead th {
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+            padding-right: 30px;
+            transition: background-color 0.2s;
+        }
+        .tabla-usuarios thead th:hover { background-color: #0052cc; }
+        .tabla-usuarios thead th.no-sort { cursor: default; padding-right: 12px; }
+        .tabla-usuarios thead th.no-sort:hover { background-color: var(--color-boton); }
+
+        .sort-icon {
+            position: absolute; right: 10px; top: 50%;
+            transform: translateY(-50%); font-size: 16px;
+            opacity: 0.5; transition: opacity 0.2s;
+        }
+        .tabla-usuarios thead th:hover .sort-icon { opacity: 0.8; }
+        .tabla-usuarios thead th.sort-asc .sort-icon,
+        .tabla-usuarios thead th.sort-desc .sort-icon { opacity: 1; }
+
+        .filter-row { background-color: #f8f9fa; }
+        .filter-row th { padding: 8px 12px; border-bottom: 2px solid #dee2e6; }
+
+        .filter-input {
+            width: 100%; padding: 6px 8px;
+            border: 1px solid #ced4da; border-radius: 4px;
+            font-size: 13px; font-family: 'Roboto', sans-serif;
+            outline: none; transition: border-color 0.2s;
+        }
+        .filter-input:focus {
+            border-color: var(--color-boton);
+            box-shadow: 0 0 0 2px rgba(1,102,255,0.1);
+        }
+        .filter-input::placeholder { color: #adb5bd; font-style: italic; }
+        .filter-input.has-value { border-color: var(--color-boton); background-color: #e7f3ff; }
+
+        /* ============================================
+           TOOLBAR SUPERIOR
+           ============================================ */
+        .clear-filters-btn {
+            padding: 8px 16px; background-color: #6c757d; color: white;
+            border: none; border-radius: 5px; font-size: 13px; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 5px;
+            transition: background-color 0.2s;
+        }
+        .clear-filters-btn:hover { background-color: #5a6268; }
+        .clear-filters-btn ion-icon { font-size: 16px; }
+
+        /* Botón filtro conectados */
+        .btn-conectados {
+            padding: 8px 16px; border: 2px solid #28a745; color: #28a745;
+            background-color: white; border-radius: 5px; font-size: 13px;
+            font-weight: 600; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-conectados:hover,
+        .btn-conectados.activo {
+            background-color: #28a745; color: white;
+        }
+        .btn-conectados ion-icon { font-size: 16px; }
+
+        .results-counter {
+            padding: 10px 15px; background-color: #e7f3ff; border-radius: 5px;
+            font-size: 14px; color: var(--color-texto-menu);
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .results-counter ion-icon { font-size: 18px; color: var(--color-boton); }
+
+        .toolbar-top {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; flex-wrap: wrap; gap: 10px;
+        }
+        .toolbar-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+        /* ============================================
+           INDICADOR DE CONEXIÓN EN TABLA
+           ============================================ */
+        .dot-conectado {
+            display: inline-block; width: 9px; height: 9px;
+            border-radius: 50%; margin-right: 5px; flex-shrink: 0;
+        }
+        .dot-conectado.online {
+            background-color: #28a745;
+            box-shadow: 0 0 0 2px rgba(40,167,69,0.25);
+            animation: pulse-dot 2s infinite;
+        }
+        .dot-conectado.offline { background-color: #ced4da; }
+
+        @keyframes pulse-dot {
+            0%  { box-shadow: 0 0 0 0   rgba(40,167,69,0.5); }
+            70% { box-shadow: 0 0 0 6px rgba(40,167,69,0); }
+            100%{ box-shadow: 0 0 0 0   rgba(40,167,69,0); }
+        }
+
+        .usuario-cell { display: flex; align-items: center; gap: 6px; }
+        .usuario-cell ion-icon { font-size: 22px; color: var(--color-boton); flex-shrink: 0; }
+
+        /* Último acceso */
+        .ultimo-acceso-cell { white-space: nowrap; font-size: 13px; }
+        .tiempo-reciente  { color: #28a745; font-weight: 600; }
+        .tiempo-hoy       { color: #0166ff; }
+        .tiempo-semana    { color: #495057; }
+        .tiempo-antiguo   { color: #adb5bd; }
+        .tiempo-nunca     { color: #dee2e6; font-style: italic; }
+
+        /* ============================================
+           STAT CARD CONECTADOS (verde)
+           ============================================ */
+        .stat-card.conectados ion-icon { color: #28a745; }
+
+        /* ============================================
+           SECCIÓN GRÁFICA
+           ============================================ */
+        .chart-section {
+            background: white; border-radius: 10px; padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px;
+        }
+        .chart-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; padding-bottom: 10px;
+            border-bottom: 2px solid var(--color-boton);
+        }
+        .chart-header h3 {
+            margin: 0; font-size: 15px; color: var(--color-texto-menu);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .chart-header h3 ion-icon { color: var(--color-boton); font-size: 20px; }
+        .chart-subtitle { font-size: 12px; color: #888; }
+        .chart-wrapper { position: relative; height: 200px; }
+
+        /* ============================================
+           TOGGLE SWITCH
+           ============================================ */
+        .toggle-container {
+            display: flex; align-items: center; gap: 10px;
+            margin: 15px 0; padding: 12px;
+            background-color: #f8f9fa; border-radius: 8px;
+        }
+        .toggle-switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 24px;
+        }
+        .toggle-slider:before {
+            position: absolute; content: "";
+            height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .toggle-slider { background-color: #28a745; }
+        input:checked + .toggle-slider:before { transform: translateX(26px); }
+        .toggle-label { display: flex; flex-direction: column; gap: 3px; }
+        .toggle-label strong { font-size: 14px; color: var(--color-texto-menu); }
+        .toggle-label small { font-size: 12px; color: #666; }
+
+        /* sesion badges */
+        .sesion-badge {
+            padding: 3px 8px; border-radius: 12px; font-size: 11px;
+            font-weight: 600; display: inline-flex; align-items: center; gap: 3px;
+        }
+        .sesion-badge.permanente { background-color: #d4edda; color: #155724; }
+        .sesion-badge.temporal   { background-color: #fff3cd; color: #856404; }
+        .sesion-badge ion-icon   { font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="menu">
+        <ion-icon name="menu-outline"></ion-icon>
+        <ion-icon name="close-outline"></ion-icon>
+    </div>
+    
+    <div class="barra-lateral">
+        <div>
+            <div class="nombre-pagina">
+                <img id="icon-logo" class="ico-logo" src="{{ url_for('static', filename='img/logo.png') }}"/>
+                <img class="logo" src="{{ url_for('static', filename='img/nombre_logo.png') }}" />    
+            </div>
+            <div class="linea"></div>
+            <br>
+        </div>
+        
+        <nav class="navegacion">
+            <ul>
+                {% if menu_permisos.home %}
+                <li>
+                    <a id="home" href="{{ url_for('home') }}">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span>Home</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if menu_permisos.callcenter %}
+                <li>
+                    <a href="{{ url_for('consultar_callcenter') }}">
+                        <ion-icon name="people-outline"></ion-icon>
+                        <span>Callcenter</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if menu_permisos.callcenter_abonados %}
+                <li>
+                    <a id="callcenter_abonados" href="{{ url_for('callcenter_abonados') }}">
+                        <ion-icon name="accessibility-outline"></ion-icon>
+                        <span>Abonados</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if menu_permisos.n1 %}
+                <li>
+                    <a id="n1_active" href="{{ url_for('n1') }}">
+                        <ion-icon name="speedometer-outline"></ion-icon>
+                        <span>Monitoreo N1</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if menu_permisos.trabajos_programados %}
+                <li>
+                    <a id="trabajos_programados" href="{{ url_for('route_trabajos_programados') }}">
+                        <ion-icon name="calendar-outline"></ion-icon>
+                        <span>Trabajos Programados</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if menu_permisos.dashboard %}
+                <li class="has-submenu">
+                    <a href="{{ url_for('dashboard') }}">
+                        <ion-icon name="bar-chart-outline"></ion-icon>
+                        <span>Dashboards</span>
+                    </a>
+                    <ul class="submenu">
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_fija') }}">
+                                <ion-icon name="home-outline"></ion-icon>
+                                <span>Estado Red Fija</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('dash_movil') }}">
+                                <ion-icon name="phone-portrait-outline"></ion-icon>
+                                <span>Estado Red Móvil</span>
+                            </a>
+                        </li>
+                        <li class="has-submenu">
+                            <a href="{{ url_for('dash_backhaul') }}">
+                                <ion-icon name="git-network-outline"></ion-icon>
+                                <span>Red Backhaul</span>
+                            </a>
+                            <ul class="submenu">
+                                <li><a href="{{ url_for('monitoreo_hl5') }}"><ion-icon name="desktop-outline"></ion-icon><span>Monitoreo HL5</span></a></li>
+                                <li><a href="{{ url_for('seguimiento_hl5') }}"><ion-icon name="search-outline"></ion-icon><span>Seguimiento HL5</span></a></li>
+                                <li><a href="{{ url_for('aperturas_anillos') }}"><ion-icon name="git-branch-outline"></ion-icon><span>Aperturas de Anillos y Cabeceras</span></a></li>
+                            </ul>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% endif %}
+                {% if menu_permisos.servicio_al_cliente %}
+                <li>
+                    <a id="servicio_al_cliente" href="{{ url_for('servicio_al_cliente') }}">
+                        <ion-icon name="globe-outline"></ion-icon>
+                        <span>Mapa en Vivo</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if menu_permisos.gobernanza %}
+                <li>
+                    <a href="{{ url_for('gobernanza') }}">
+                        <ion-icon name="shield-checkmark-outline"></ion-icon>
+                        <span>Gobernanza</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if menu_permisos.admin_solicitudes %}
+                <li>
+                    <a href="{{ url_for('admin_solicitudes') }}">
+                        <ion-icon name="person-add-outline"></ion-icon>
+                        <span>Solicitudes</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if menu_permisos.gestion_usuarios %}
+                <li>
+                    <a href="{{ url_for('gestion_usuarios') }}">
+                        <ion-icon name="people-circle-outline"></ion-icon>
+                        <span>Gestión de Usuarios</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        
+        <div>
+            <div class="linea"></div>
+            <div class="usuario">
+                <img src="{{ url_for('static', filename='img/ico_person-circle-outline_blue.svg') }}" alt="" class="img_user">
+                <div class="info-usuario">
+                    <div class="usuario_red">
+                        <span class="usuario_name">{{ session['USUARIO'] }}</span>
+                        {% if perfil_usuario %}
+                        <small style="font-size: 10px; color: #666; margin-top: 2px; display: block;">{{ perfil_usuario }}</small>
+                        {% endif %}
+                    </div>
+                    <form action="{{ url_for('logout') }}" method="post">
+                        <button id="logoutBtn" class="logout-btn">
+                            <ion-icon name="log-out-outline"></ion-icon>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <h1>Gestión de Usuarios</h1>
+        
+        <!-- MENSAJES FLASH -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+        
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+            <div class="search-box">
+                <ion-icon name="search-outline"></ion-icon>
+                <input type="text" id="buscarUsuario" placeholder="Búsqueda general...">
+            </div>
+            <div class="toolbar-actions">
+                <select id="filtroEstado" onchange="aplicarFiltros()">
+                    <option value="todos">Todos los estados</option>
+                    <option value="ACTIVO">Activos</option>
+                    <option value="INACTIVO">Inactivos</option>
+                </select>
+                <select id="filtroPerfil" onchange="aplicarFiltros()">
+                    <option value="todos">Todos los perfiles</option>
+                    <option value="ADMIN">Administrador</option>
+                    <option value="CG">Centro de Gestión</option>
+                    <option value="Callcenter">Callcenter</option>
+                    <option value="Servicio al Cliente">Servicio al Cliente</option>
+                    <option value="Dashboards">Dashboards</option>
+                    <option value="Dashboards - Servicio al Cliente">Dashboards - Servicio al Cliente</option>
+                    <option value="Externos">Externos</option>
+                </select>
+                <button class="btn-agregar" onclick="mostrarModalAgregar()">
+                    <ion-icon name="person-add-outline"></ion-icon>
+                    Agregar Usuario
+                </button>
+            </div>
+        </div>
+        
+        <!-- ESTADÍSTICAS -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <ion-icon name="people"></ion-icon>
+                <div class="stat-info">
+                    <div class="stat-value">{{ total_usuarios }}</div>
+                    <div class="stat-label">Total Usuarios</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <ion-icon name="checkmark-circle"></ion-icon>
+                <div class="stat-info">
+                    <div class="stat-value">{{ usuarios_activos }}</div>
+                    <div class="stat-label">Activos</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <ion-icon name="close-circle"></ion-icon>
+                <div class="stat-info">
+                    <div class="stat-value">{{ usuarios_inactivos }}</div>
+                    <div class="stat-label">Inactivos</div>
+                </div>
+            </div>
+            <!-- ⭐ NUEVO: Conectados ahora -->
+            <div class="stat-card conectados">
+                <ion-icon name="radio-outline"></ion-icon>
+                <div class="stat-info">
+                    <div class="stat-value" id="stat-conectados">{{ usuarios_conectados }}</div>
+                    <div class="stat-label">Conectados Ahora</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ⭐ NUEVA: GRÁFICA DE USO POR HORA -->
+        <div class="chart-section">
+            <div class="chart-header">
+                <h3>
+                    <ion-icon name="bar-chart-outline"></ion-icon>
+                    Uso del Sistema por Hora
+                </h3>
+                <span class="chart-subtitle">Logins en los últimos 30 días</span>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="chartUsoHoras"></canvas>
+            </div>
+        </div>
+        
+        <!-- BARRA SUPERIOR DE TABLA -->
+        <div class="toolbar-top">
+            <div class="toolbar-left">
+                <div class="results-counter">
+                    <ion-icon name="funnel-outline"></ion-icon>
+                    <span>Mostrando <strong id="contador-visibles">0</strong> de <strong id="contador-total">0</strong> usuarios</span>
+                </div>
+                <!-- ⭐ NUEVO: Filtro conectados -->
+                <button class="btn-conectados" id="btnFiltroConectados" onclick="toggleFiltroConectados()" title="Ver solo usuarios conectados ahora">
+                    <ion-icon name="radio-outline"></ion-icon>
+                    Solo Conectados
+                </button>
+                <button class="clear-filters-btn" onclick="limpiarTodosFiltros()" title="Limpiar todos los filtros">
+                    <ion-icon name="close-circle-outline"></ion-icon>
+                    Limpiar Filtros
+                </button>
+            </div>
+        </div>
+        
+        <!-- TABLA DE USUARIOS -->
+        <div class="tabla-container">
+            <table class="tabla-usuarios" id="tablaUsuarios">
+                <thead>
+                    <tr>
+                        <th onclick="ordenarTabla('usuario')" data-column="usuario">
+                            Usuario <ion-icon name="swap-vertical-outline" class="sort-icon"></ion-icon>
+                        </th>
+                        <th onclick="ordenarTabla('nombre')" data-column="nombre">
+                            Nombre Completo <ion-icon name="swap-vertical-outline" class="sort-icon"></ion-icon>
+                        </th>
+                        <th onclick="ordenarTabla('correo')" data-column="correo">
+                            Correo <ion-icon name="swap-vertical-outline" class="sort-icon"></ion-icon>
+                        </th>
+                        <th onclick="ordenarTabla('area')" data-column="area">
+                            Área <ion-icon name="swap-vertical-outline" class="sort-icon"></ion-icon>
+                        </th>
+                        <th onclick="ordenarTabla('perfil')" data-column="perfil">
+                            Perfil <ion-icon name="swap-vertical-outline" class="sort-icon"></ion-icon>
+                        </th>
+                        <th onclick="ordenarTabla('estado')" data-column="estado">
+                            Estado <ion-icon name="swap-vertical-outline" class="sort-icon"></ion-icon>
+                        </th>
+                        <th onclick="ordenarTabla('sesion')" data-column="sesion">
+                            Tipo Sesión <ion-icon name="swap-vertical-outline" class="sort-icon"></ion-icon>
+                        </th>
+                        <!-- ⭐ NUEVO: Último Acceso -->
+                        <th onclick="ordenarTabla('acceso')" data-column="acceso">
+                            Último Acceso <ion-icon name="swap-vertical-outline" class="sort-icon"></ion-icon>
+                        </th>
+                        <th onclick="ordenarTabla('fecha')" data-column="fecha">
+                            Creación <ion-icon name="swap-vertical-outline" class="sort-icon"></ion-icon>
+                        </th>
+                        <th class="no-sort">Acciones</th>
+                    </tr>
+                    
+                    <!-- FILA DE FILTROS -->
+                    <tr class="filter-row">
+                        <th><input type="text" class="filter-input" id="filter-usuario" placeholder="Filtrar..." onkeyup="aplicarFiltros()"></th>
+                        <th><input type="text" class="filter-input" id="filter-nombre"  placeholder="Filtrar..." onkeyup="aplicarFiltros()"></th>
+                        <th><input type="text" class="filter-input" id="filter-correo"  placeholder="Filtrar..." onkeyup="aplicarFiltros()"></th>
+                        <th><input type="text" class="filter-input" id="filter-area"    placeholder="Filtrar..." onkeyup="aplicarFiltros()"></th>
+                        <th>
+                            <select class="filter-input" id="filter-perfil-col" onchange="aplicarFiltros()">
+                                <option value="">Todos</option>
+                                <option value="ADMIN">Admin</option>
+                                <option value="CG">CG</option>
+                                <option value="Callcenter">Callcenter</option>
+                                <option value="Servicio al Cliente">Serv. Cliente</option>
+                                <option value="Dashboards">Dashboards</option>
+                                <option value="Externos">Externos</option>
+                            </select>
+                        </th>
+                        <th>
+                            <select class="filter-input" id="filter-estado-col" onchange="aplicarFiltros()">
+                                <option value="">Todos</option>
+                                <option value="ACTIVO">Activo</option>
+                                <option value="INACTIVO">Inactivo</option>
+                            </select>
+                        </th>
+                        <th>
+                            <select class="filter-input" id="filter-sesion-col" onchange="aplicarFiltros()">
+                                <option value="">Todos</option>
+                                <option value="1">Sin límite</option>
+                                <option value="0">30 min</option>
+                            </select>
+                        </th>
+                        <!-- ⭐ NUEVO filtro acceso -->
+                        <th><input type="text" class="filter-input" id="filter-acceso" placeholder="Filtrar..." onkeyup="aplicarFiltros()"></th>
+                        <th><input type="text" class="filter-input" id="filter-fecha"  placeholder="Filtrar..." onkeyup="aplicarFiltros()"></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if usuarios %}
+                        {% for usuario in usuarios %}
+                        <tr class="fila-usuario"
+                            data-estado="{{ usuario.estado }}"
+                            data-perfil="{{ usuario.perfil }}"
+                            data-usuario="{{ usuario.usuario|lower }}"
+                            data-nombre="{{ (usuario.nombre ~ ' ' ~ usuario.apellido)|lower }}"
+                            data-correo="{{ usuario.correo|lower }}"
+                            data-area="{{ usuario.area|lower }}"
+                            data-sesion="{{ usuario.sesion_permanente }}"
+                            data-fecha="{{ usuario.fecha_creacion }}"
+                            data-acceso="{{ usuario.ultimo_login if usuario.ultimo_login else '' }}"
+                            data-acceso-iso="{{ usuario.ultimo_login_iso if usuario.ultimo_login_iso else '' }}"
+                            data-conectado="{{ 'true' if usuario.conectado else 'false' }}">
+                            
+                            <td>
+                                <div class="usuario-cell">
+                                    <span class="dot-conectado {{ 'online' if usuario.conectado else 'offline' }}"
+                                          title="{{ 'Conectado ahora' if usuario.conectado else 'Sin sesión activa' }}"></span>
+                                    <ion-icon name="person-circle-outline"></ion-icon>
+                                    {{ usuario.usuario }}
+                                </div>
+                            </td>
+                            <td>{{ usuario.nombre }} {{ usuario.apellido }}</td>
+                            <td>{{ usuario.correo }}</td>
+                            <td>{{ usuario.area }}</td>
+                            <td>
+                                <span class="badge badge-perfil badge-{{ usuario.perfil|lower|replace(' ', '-') }}">
+                                    {{ usuario.perfil }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge badge-estado badge-{{ usuario.estado|lower }}">
+                                    {{ usuario.estado }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if usuario.sesion_permanente == 1 %}
+                                    <span class="sesion-badge permanente" title="Sesión sin timeout">
+                                        <ion-icon name="infinite-outline"></ion-icon> Sin límite
+                                    </span>
+                                {% else %}
+                                    <span class="sesion-badge temporal" title="Sesión expira en 30 minutos">
+                                        <ion-icon name="time-outline"></ion-icon> 30 min
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <!-- ⭐ NUEVO: Último Acceso (el JS lo rellena con tiempo relativo) -->
+                            <td class="ultimo-acceso-cell"
+                                data-iso="{{ usuario.ultimo_login_iso if usuario.ultimo_login_iso else '' }}">
+                                {% if usuario.ultimo_login %}
+                                    {{ usuario.ultimo_login }}
+                                {% else %}
+                                    <span class="tiempo-nunca">Nunca</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ usuario.fecha_creacion }}</td>
+                            <td class="acciones-cell">
+                                <!-- ⭐ MODIFICADO: datos en atributos para mayor seguridad -->
+                                <button class="btn-icon btn-edit"
+                                        data-usuario="{{ usuario.usuario }}"
+                                        data-nombre="{{ usuario.nombre }}"
+                                        data-apellido="{{ usuario.apellido }}"
+                                        data-correo="{{ usuario.correo }}"
+                                        data-area="{{ usuario.area }}"
+                                        data-perfil="{{ usuario.perfil }}"
+                                        data-estado="{{ usuario.estado }}"
+                                        data-sesion="{{ usuario.sesion_permanente }}"
+                                        onclick="mostrarModalEditarDesdeBtn(this)"
+                                        title="Editar usuario">
+                                    <ion-icon name="create-outline"></ion-icon>
+                                </button>
+                                <button class="btn-icon btn-password"
+                                        onclick="mostrarModalPassword('{{ usuario.usuario }}', '{{ usuario.nombre }} {{ usuario.apellido }}')"
+                                        title="Cambiar contraseña">
+                                    <ion-icon name="key-outline"></ion-icon>
+                                </button>
+                                <button class="btn-icon btn-delete"
+                                        onclick="confirmarEliminar('{{ usuario.usuario }}', '{{ usuario.nombre }} {{ usuario.apellido }}')"
+                                        title="Eliminar usuario">
+                                    <ion-icon name="trash-outline"></ion-icon>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="10" class="no-usuarios">
+                                <ion-icon name="people-outline"></ion-icon>
+                                <p>No hay usuarios registrados</p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- ============================================================
+         MODAL: Editar Usuario  ⭐ EXPANDIDO con nombre/correo/área
+         ============================================================ -->
+    <div id="modalEditar" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="cerrarModal('modalEditar')">&times;</span>
+            <h2><ion-icon name="create-outline"></ion-icon> Editar Usuario</h2>
+            <form id="formEditar" method="post" action="{{ url_for('editar_usuario') }}">
+                <input type="hidden" name="usuario_red" id="edit_usuario_red">
+                
+                <div class="modal-info">
+                    <p><strong>Usuario:</strong> <span id="edit_display_usuario"></span></p>
+                </div>
+
+                <!-- Fila 1: Nombre y Apellido -->
+                <div class="form-row">
+                    <div class="form-group-modal">
+                        <label for="edit_nombre">Nombre: *</label>
+                        <input type="text" name="nombre" id="edit_nombre" required>
+                    </div>
+                    <div class="form-group-modal">
+                        <label for="edit_apellido">Apellido: *</label>
+                        <input type="text" name="apellido" id="edit_apellido" required>
+                    </div>
+                </div>
+
+                <!-- Fila 2: Correo y Área -->
+                <div class="form-row">
+                    <div class="form-group-modal">
+                        <label for="edit_correo">Correo: *</label>
+                        <input type="email" name="correo" id="edit_correo" required>
+                    </div>
+                    <div class="form-group-modal">
+                        <label for="edit_area">Área: *</label>
+                        <input type="text" name="area" id="edit_area" required>
+                    </div>
+                </div>
+
+                <!-- Fila 3: Perfil y Estado -->
+                <div class="form-row">
+                    <div class="form-group-modal">
+                        <label for="edit_perfil">Perfil: *</label>
+                        <select name="perfil" id="edit_perfil" required>
+                            <option value="">Seleccione un perfil</option>
+                            <option value="ADMIN">Administrador</option>
+                            <option value="CG">Centro de Gestión</option>
+                            <option value="Callcenter">Callcenter</option>
+                            <option value="Servicio al Cliente">Servicio al Cliente</option>
+                            <option value="Dashboards">Dashboards</option>
+                            <option value="Dashboards - Servicio al Cliente">Dashboards - Servicio al Cliente</option>
+                            <option value="Externos">Externos</option>
+                        </select>
+                    </div>
+                    <div class="form-group-modal">
+                        <label for="edit_estado">Estado: *</label>
+                        <select name="estado" id="edit_estado" required>
+                            <option value="ACTIVO">Activo</option>
+                            <option value="INACTIVO">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="toggle-container">
+                    <label class="toggle-switch">
+                        <input type="checkbox" name="sesion_permanente" id="edit_sesion_permanente">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <div class="toggle-label">
+                        <strong>Sesión Sin Timeout</strong>
+                        <small>Si está activado, la sesión del usuario nunca expirará automáticamente</small>
+                    </div>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-modal btn-confirmar">
+                        <ion-icon name="checkmark-circle"></ion-icon> Guardar Cambios
+                    </button>
+                    <button type="button" class="btn-modal btn-cancelar" onclick="cerrarModal('modalEditar')">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Cambiar Contraseña (sin cambios) -->
+    <div id="modalPassword" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal('modalPassword')">&times;</span>
+            <h2><ion-icon name="key-outline"></ion-icon> Cambiar Contraseña</h2>
+            <form id="formPassword" method="post" action="{{ url_for('cambiar_password') }}">
+                <input type="hidden" name="usuario_red" id="pass_usuario_red">
+                <div class="modal-info">
+                    <p><strong>Usuario:</strong> <span id="pass_display_nombre"></span></p>
+                </div>
+                <div class="form-group-modal">
+                    <label for="nueva_password">Nueva Contraseña: *</label>
+                    <input type="password" name="nueva_password" id="nueva_password" required
+                           pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+                    <small>Mínimo 8 caracteres, con mayúsculas, minúsculas y números</small>
+                </div>
+                <div class="form-group-modal">
+                    <label for="confirmar_password">Confirmar Contraseña: *</label>
+                    <input type="password" name="confirmar_password" id="confirmar_password" required>
+                    <small class="error-message" id="password-error"></small>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-modal btn-confirmar">
+                        <ion-icon name="key"></ion-icon> Cambiar Contraseña
+                    </button>
+                    <button type="button" class="btn-modal btn-cancelar" onclick="cerrarModal('modalPassword')">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Agregar Usuario (sin cambios) -->
+    <div id="modalAgregar" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="cerrarModal('modalAgregar')">&times;</span>
+            <h2><ion-icon name="person-add-outline"></ion-icon> Agregar Nuevo Usuario</h2>
+            <form id="formAgregar" method="post" action="{{ url_for('agregar_usuario') }}">
+                <div class="form-row">
+                    <div class="form-group-modal">
+                        <label for="add_nombre">Nombre: *</label>
+                        <input type="text" name="nombre" id="add_nombre" required>
+                    </div>
+                    <div class="form-group-modal">
+                        <label for="add_apellido">Apellido: *</label>
+                        <input type="text" name="apellido" id="add_apellido" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group-modal">
+                        <label for="add_usuario_red">Usuario de Red: *</label>
+                        <input type="text" name="usuario_red" id="add_usuario_red" required>
+                    </div>
+                    <div class="form-group-modal">
+                        <label for="add_correo">Correo: *</label>
+                        <input type="email" name="correo" id="add_correo" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group-modal">
+                        <label for="add_area">Área: *</label>
+                        <input type="text" name="area" id="add_area" required>
+                    </div>
+                    <div class="form-group-modal">
+                        <label for="add_telefono">Teléfono:</label>
+                        <input type="tel" name="telefono" id="add_telefono">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group-modal">
+                        <label for="add_perfil">Perfil: *</label>
+                        <select name="perfil" id="add_perfil" required>
+                            <option value="">Seleccione un perfil</option>
+                            <option value="ADMIN">Administrador</option>
+                            <option value="CG">Centro de Gestión</option>
+                            <option value="Callcenter">Callcenter</option>
+                            <option value="Servicio al Cliente">Servicio al Cliente</option>
+                            <option value="Dashboards">Dashboards</option>
+                            <option value="Dashboards - Servicio al Cliente">Dashboards - Servicio al Cliente</option>
+                            <option value="Externos">Externos</option>
+                        </select>
+                    </div>
+                    <div class="form-group-modal">
+                        <label for="add_password">Contraseña Inicial: *</label>
+                        <input type="password" name="password" id="add_password" required
+                               pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+                        <small>Mínimo 8 caracteres, con mayúsculas, minúsculas y números</small>
+                    </div>
+                </div>
+                <div class="toggle-container">
+                    <label class="toggle-switch">
+                        <input type="checkbox" name="sesion_permanente" id="add_sesion_permanente">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <div class="toggle-label">
+                        <strong>Sesión Sin Timeout</strong>
+                        <small>Si está activado, la sesión del usuario nunca expirará automáticamente</small>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-modal btn-confirmar">
+                        <ion-icon name="person-add"></ion-icon> Crear Usuario
+                    </button>
+                    <button type="button" class="btn-modal btn-cancelar" onclick="cerrarModal('modalAgregar')">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Pasar datos del histograma al JS -->
+    <script>
+        // Datos del histograma generados por Flask/Jinja2
+        const HISTOGRAMA_HORAS = {{ histograma_horas | tojson }};
+    </script>
+
+    <script src="{{ url_for('static', filename='js/template.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/template_submenu.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/gestion_usuarios.js') }}"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</body>
+</html>

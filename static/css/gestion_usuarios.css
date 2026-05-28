@@ -1,0 +1,654 @@
+:root {
+    --color-barra-lateral: rgb(255,255,255);
+    --color-texto: #0166ff;
+    --color-texto-menu: #0b283a;
+    --color-boton: #0166ff;
+    --color-boton-texto: rgb(255,255,255);
+    --color-menu-hover: rgb(238,238,238);
+    --color-menu-hover-texto: #0166ff;
+    --color-linea: rgb(241,241,241);
+    --color-exito: #28a745;
+    --color-peligro: #dc3545;
+    --color-advertencia: #ffc107;
+    --color-info: #17a2b8;
+}
+
+* {
+    font-family: 'Roboto', sans-serif;
+}
+
+/* ============================================
+   TOOLBAR Y BÚSQUEDA
+   ============================================ */
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.search-box {
+    flex: 1;
+    min-width: 250px;
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 10px 15px;
+}
+
+.search-box ion-icon {
+    font-size: 20px;
+    color: #666;
+    margin-right: 10px;
+}
+
+.search-box input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 14px;
+    color: var(--color-texto-menu);
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.toolbar-actions select {
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    background-color: white;
+}
+
+.btn-agregar {
+    padding: 10px 20px;
+    background-color: var(--color-boton);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-agregar:hover {
+    background-color: #0052cc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(1, 102, 255, 0.3);
+}
+
+.btn-agregar ion-icon {
+    font-size: 20px;
+}
+
+/* ============================================
+   ESTADÍSTICAS
+   ============================================ */
+
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.stat-card ion-icon {
+    font-size: 40px;
+    color: var(--color-boton);
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--color-texto-menu);
+}
+
+.stat-label {
+    font-size: 13px;
+    color: #666;
+}
+
+/* ============================================
+   TABLA DE USUARIOS
+   ============================================ */
+
+.tabla-container {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+
+.tabla-usuarios {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.tabla-usuarios thead {
+    background-color: var(--color-boton);
+    color: white;
+}
+
+.tabla-usuarios th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tabla-usuarios td {
+    padding: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.tabla-usuarios tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.tabla-usuarios tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.usuario-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.usuario-cell ion-icon {
+    font-size: 24px;
+    color: var(--color-boton);
+}
+
+/* ============================================
+   BADGES
+   ============================================ */
+
+.badge {
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+/* Badges de Estado */
+.badge-estado.badge-activo {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.badge-estado.badge-inactivo {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Badges de Perfil */
+.badge-perfil {
+    font-size: 11px;
+}
+
+.badge-perfil.badge-admin,
+.badge-perfil.badge-administrador {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+
+.badge-perfil.badge-cg {
+    background-color: #f3e5f5;
+    color: #6a1b9a;
+}
+
+.badge-perfil.badge-callcenter {
+    background-color: #fff3e0;
+    color: #e65100;
+}
+
+.badge-perfil.badge-servicio-al-cliente {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.badge-perfil.badge-dashboards,
+.badge-perfil.badge-dashboards---servicio-al-cliente {
+    background-color: #fce4ec;
+    color: #c2185b;
+}
+
+/* ⭐ EXTERNOS - Gris */
+.badge-perfil.badge-externos {
+    background-color: #e0e0e0;
+    color: #3c3c3c;
+}
+
+/* ============================================
+   ACCIONES (BOTONES ICONOS)
+   ============================================ */
+
+.acciones-cell {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-icon {
+    padding: 6px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    background-color: transparent;
+}
+
+.btn-icon ion-icon {
+    font-size: 20px;
+}
+
+.btn-edit {
+    color: var(--color-boton);
+}
+
+.btn-edit:hover {
+    background-color: #e3f2fd;
+}
+
+.btn-password {
+    color: var(--color-advertencia);
+}
+
+.btn-password:hover {
+    background-color: #fff3e0;
+}
+
+.btn-delete {
+    color: var(--color-peligro);
+}
+
+.btn-delete:hover {
+    background-color: #ffebee;
+}
+
+/* ============================================
+   MODALES
+   ============================================ */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 3% auto;
+    padding: 30px;
+    border: 1px solid #888;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: slideDown 0.3s;
+}
+
+.modal-large {
+    max-width: 800px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-content h2 {
+    color: var(--color-texto-menu);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--color-boton);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-content h2 ion-icon {
+    font-size: 28px;
+    color: var(--color-boton);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 20px;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+}
+
+.modal-info {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.modal-info p {
+    margin: 8px 0;
+    color: var(--color-texto-menu);
+    font-size: 14px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group-modal {
+    margin-bottom: 20px;
+}
+
+.form-group-modal label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--color-texto-menu);
+    font-size: 14px;
+}
+
+.form-group-modal input,
+.form-group-modal select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    outline: none;
+}
+
+.form-group-modal input:focus,
+.form-group-modal select:focus {
+    border-color: var(--color-boton);
+    box-shadow: 0 0 5px rgba(1, 102, 255, 0.3);
+}
+
+.form-group-modal small {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #666;
+}
+
+.error-message {
+    color: var(--color-peligro);
+    font-weight: 600;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.btn-modal {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-modal ion-icon {
+    font-size: 20px;
+}
+
+.btn-confirmar {
+    background-color: var(--color-exito);
+    color: white;
+}
+
+.btn-confirmar:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+.btn-cancelar {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-cancelar:hover {
+    background-color: #5a6268;
+}
+
+/* ============================================
+   MENSAJES FLASH
+   ============================================ */
+
+.flash-messages {
+    margin-bottom: 20px;
+}
+
+.alert {
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideInRight 0.4s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+/* ============================================
+   NO HAY USUARIOS
+   ============================================ */
+
+.no-usuarios {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.no-usuarios ion-icon {
+    font-size: 80px;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.no-usuarios p {
+    font-size: 18px;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .toolbar-actions {
+        flex-direction: column;
+    }
+    
+    .toolbar-actions select,
+    .btn-agregar {
+        width: 100%;
+    }
+    
+    .stats-container {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .tabla-container {
+        overflow-x: scroll;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+        padding: 20px;
+    }
+    
+    .modal-buttons {
+        flex-direction: column;
+    }
+    
+    .acciones-cell {
+        flex-direction: column;
+        gap: 3px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        padding: 15px;
+    }
+    
+    .stat-value {
+        font-size: 24px;
+    }
+}
+
+/* ============================================
+   UTILIDADES
+   ============================================ */
+
+.oculto {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}

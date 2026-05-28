@@ -1,0 +1,228 @@
+/* ============================================
+   SUBMENÚ ACORDEÓN HÍBRIDO v2 - SmartSOC
+   Funciona con HOVER y CLIC
+   Optimizado para mejor legibilidad del texto
+   ============================================ */
+
+/* Estilos base para items con submenú */
+.barra-lateral .navegacion li.has-submenu {
+    position: relative;
+}
+
+.barra-lateral .navegacion li.has-submenu > a {
+    position: relative;
+}
+
+/* Icono de flecha para indicar submenú */
+.barra-lateral .navegacion li.has-submenu > a::after {
+    content: '';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%) rotate(0deg);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--color-texto-menu);
+    transition: transform 0.3s ease;
+}
+
+/* Rotar flecha cuando está abierto (hover O clic) */
+.barra-lateral .navegacion li.has-submenu:hover > a::after,
+.barra-lateral .navegacion li.has-submenu.active > a::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+/* Contenedor del submenú - VERTICAL / ACORDEÓN */
+.barra-lateral .navegacion .submenu {
+    position: relative;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+    list-style: none;
+}
+
+/* ⭐ CLAVE: Mostrar con HOVER o con CLIC (clase active) */
+.barra-lateral .navegacion li.has-submenu:hover > .submenu,
+.barra-lateral .navegacion li.has-submenu.active > .submenu {
+    max-height: 500px;
+    opacity: 1;
+    padding: 5px 0;
+    margin-top: 5px;
+}
+
+/* Estilos de items dentro del submenú */
+.barra-lateral .navegacion .submenu li {
+    margin-bottom: 2px;
+    padding: 0;
+    list-style: none;
+}
+
+/* ✅ OPTIMIZADO: Menos padding para mejor legibilidad */
+.barra-lateral .navegacion .submenu a {
+    height: 40px;
+    padding-left: 5px;  /* Reducido de 50px */
+    padding-right: 8px;  /* Añadido para balance */
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--color-texto-menu);
+    border-radius: 10px;
+    margin: 0 3px;  /* Reducido de 5px */
+    transition: all 0.2s ease;
+}
+
+/* ✅ OPTIMIZADO: Iconos mejor alineados */
+.barra-lateral .navegacion .submenu a ion-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    flex-shrink: 0;
+}
+
+/* ✅ OPTIMIZADO: Texto con ellipsis si es muy largo */
+.barra-lateral .navegacion .submenu a span {
+    margin-left: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+
+/* Hover effects */
+.barra-lateral .navegacion .submenu a:hover {
+    background-color: var(--color-menu-hover);
+    color: var(--color-menu-hover-texto);
+    transform: translateX(3px);
+}
+
+/* Submenú anidado (nivel 2) */
+.barra-lateral .navegacion .submenu li.has-submenu {
+    position: relative;
+}
+
+.barra-lateral .navegacion .submenu li.has-submenu > a::after {
+    content: '';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%) rotate(0deg);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid var(--color-texto-menu);
+    transition: transform 0.3s ease;
+}
+
+/* Rotar flecha nivel 2 (hover O clic) */
+.barra-lateral .navegacion .submenu li.has-submenu:hover > a::after,
+.barra-lateral .navegacion .submenu li.has-submenu.active > a::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+/* Submenú de segundo nivel - también vertical y con hover/clic */
+.barra-lateral .navegacion .submenu .submenu {
+    background-color: rgba(0, 0, 0, 0.05);
+    margin-top: 2px;
+}
+
+/* ⭐ Mostrar nivel 2 con HOVER o CLIC */
+.barra-lateral .navegacion .submenu li.has-submenu:hover > .submenu,
+.barra-lateral .navegacion .submenu li.has-submenu.active > .submenu {
+    max-height: 400px;
+    opacity: 1;
+    padding: 5px 0;
+}
+
+/* ✅ OPTIMIZADO: Nivel 2 con menos padding */
+.barra-lateral .navegacion .submenu .submenu a {
+    padding-left: 10px;  /* Reducido de 65px */
+    font-size: 10px;
+}
+
+/* Indicador visual de página activa en submenú */
+.barra-lateral .navegacion .submenu a.active-page {
+    background-color: var(--color-menu-hover);
+    color: var(--color-menu-hover-texto);
+    border-left: 3px solid var(--color-boton);
+}
+
+/* ============================================
+   RESPONSIVE - Barra lateral mini
+   ============================================ */
+
+/* Cuando la barra está minimizada, ocultar submenús */
+.mini-barra-lateral .navegacion .submenu {
+    display: none;
+}
+
+/* ============================================
+   ANIMACIONES SUAVES
+   ============================================ */
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   MOBILE - Solo clic en móvil
+   ============================================ */
+
+@media (max-width: 768px) {
+    /* En móvil, desactivar hover y solo usar clic */
+    .barra-lateral .navegacion li.has-submenu:hover > .submenu {
+        max-height: 0;
+        opacity: 0;
+        padding: 0;
+    }
+    
+    /* En móvil, SOLO funciona con clase active */
+    .barra-lateral .navegacion li.has-submenu.active > .submenu {
+        max-height: 500px;
+        opacity: 1;
+        padding: 5px 0;
+        margin-top: 5px;
+    }
+}
+
+/* ============================================
+   MEJORAS VISUALES
+   ============================================ */
+
+/* Separador visual para submenús */
+.barra-lateral .navegacion .submenu-divider {
+    height: 1px;
+    background-color: var(--color-linea);
+    margin: 8px 15px;
+}
+
+/* Badge de notificaciones en submenú */
+.barra-lateral .navegacion .submenu a .badge {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #ff4444;
+    color: white;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: bold;
+}

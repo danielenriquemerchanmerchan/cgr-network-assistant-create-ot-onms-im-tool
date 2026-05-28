@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/logo_ico.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/monitoreo_hl5.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template_submenu.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>smartsoc | Monitoreo HL5</title>
+</head>
+<body>
+    <div class="menu">
+        <ion-icon name="menu-outline"></ion-icon>
+        <ion-icon name="close-outline"></ion-icon>
+    </div>
+    <div class="barra-lateral">
+        <div>
+            <div class="nombre-pagina">
+                <img id="icon-logo" class="ico-logo" src="{{ url_for('static', filename='img/logo.png') }}"/>
+                <img class="logo" src="{{ url_for('static', filename='img/nombre_logo.png') }}" />    
+            </div>
+            <div class="linea"></div>
+            <br>
+        </div>
+        <nav class="navegacion">
+            <ul>
+                {% if menu_permisos.home %}
+                <li>
+                    <a id="home" href="{{ url_for('home') }}">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span>Home</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.callcenter %}
+                <li>
+                    <a href="{{ url_for('consultar_callcenter') }}">
+                        <ion-icon name="people-outline"></ion-icon>
+                        <span>Callcenter</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.callcenter_abonados %}
+                <li>
+                    <a id="callcenter_abonados" href="{{ url_for('callcenter_abonados') }}">
+                        <ion-icon name="accessibility-outline"></ion-icon>
+                        <span>Abonados</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.n1 %}
+                <li>
+                    <a id="n1_active" href="{{ url_for('n1') }}">
+                        <ion-icon name="speedometer-outline"></ion-icon>
+                        <span>Monitoreo N1</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if menu_permisos.trabajos_programados %}
+                <li>
+                    <a id="trabajos_programados" href="{{ url_for('route_trabajos_programados') }}">
+                        <ion-icon name="calendar-outline"></ion-icon>
+                        <span>Trabajos Programados</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- DASHBOARDS CON SUBMENÚ -->
+                {% if menu_permisos.dashboard %}
+                <li class="has-submenu">
+                    <a href="{{ url_for('dashboard') }}">
+                        <ion-icon name="bar-chart-outline"></ion-icon>
+                        <span>Dashboards</span>
+                    </a>
+                    
+                    <!-- SUBMENÚ DE DASHBOARDS -->
+                    <ul class="submenu">
+                        <!-- Estado Red Fija -->
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_fija') }}">
+                                <ion-icon name="home-outline"></ion-icon>
+                                <span>Estado Red Fija</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <!-- Estado Red Móvil -->
+                        {% if menu_permisos.dashboard %}
+                        <li>
+                            <a href="{{ url_for('dash_movil') }}">
+                                <ion-icon name="phone-portrait-outline"></ion-icon>
+                                <span>Estado Red Móvil</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <!-- RED BACKHAUL CON SUBMENÚ ANIDADO -->
+                        {% if menu_permisos.dashboard %}
+                        <li class="has-submenu">
+                            <a href="{{ url_for('dash_backhaul') }}">
+                                <ion-icon name="git-network-outline"></ion-icon>
+                                <span>Red Backhaul</span>
+                            </a>
+                            
+                            <!-- SUBMENÚ ANIDADO DE BACKHAUL -->
+                            <ul class="submenu">
+                                <!-- Monitoreo HL5 -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('monitoreo_hl5') }}">
+                                        <ion-icon name="desktop-outline"></ion-icon>
+                                        <span>Monitoreo HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                <!-- Seguimiento HL5 -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('seguimiento_hl5') }}">
+                                        <ion-icon name="search-outline"></ion-icon>
+                                        <span>Seguimiento HL5</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                <!-- Aperturas de Anillos -->
+                                {% if menu_permisos.dashboard %}
+                                <li>
+                                    <a href="{{ url_for('aperturas_anillos') }}">
+                                        <ion-icon name="git-branch-outline"></ion-icon>
+                                        <span>Anillos y Cabeceras</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.servicio_al_cliente %}
+                <li>
+                    <a id="servicio_al_cliente" href="{{ url_for('servicio_al_cliente') }}">
+                        <ion-icon name="globe-outline"></ion-icon>
+                        <span>Mapa de Fallas</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Gobernanza - Solo para CG -->
+                {% if menu_permisos.gobernanza %}
+                <li>
+                    <a href="{{ url_for('gobernanza') }}">
+                        <ion-icon name="shield-checkmark-outline"></ion-icon>
+                        <span>Gobernanza</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% if menu_permisos.admin_solicitudes %}
+                <li>
+                    <a href="{{ url_for('admin_solicitudes') }}">
+                        <ion-icon name="person-add-outline"></ion-icon>
+                        <span>Solicitudes</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Gestión de Usuarios - Solo para ADMIN -->
+                {% if menu_permisos.gestion_usuarios %}
+                <li>
+                    <a href="{{ url_for('gestion_usuarios') }}">
+                        <ion-icon name="people-circle-outline"></ion-icon>
+                        <span>Gestión de Usuarios</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        
+        <div>
+            <div class="linea"></div>
+            <div class="usuario">
+                <img src="{{ url_for('static', filename='img/ico_person-circle-outline_blue.svg') }}" alt="" class="img_user">
+                <div class="info-usuario">
+                    <div class="usuario_red">
+                        <span class="usuario_name">{{ session['USUARIO'] }}</span>
+                        {% if perfil_usuario %}
+                        <small style="font-size: 10px; color: #666; margin-top: 2px;">{{ perfil_usuario }}</small>
+                        {% endif %}
+                    </div>
+                    <form action="{{ url_for('logout') }}" method="post">
+                        <button id="logoutBtn" class="logout-btn">
+                            <ion-icon name="log-out-outline"></ion-icon>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <h1 style="margin-bottom: 10px;">Monitoreo HL5</h1>
+        
+        <div class="hl5-container">
+            <!-- Sección de Métricas -->
+            <div class="metricas-section">
+                <!-- Hora Última Actualización -->
+                <div class="metric-card hora-actualizacion">
+                    <div class="metric-label">Hora Última Actualización</div>
+                    <div class="metric-value" id="hora-actualizacion">--</div>
+                </div>
+                
+                <!-- HL5 Afectados -->
+                <div class="metric-card hl5-afectados">
+                    <div class="metric-label">HL5 Afectados</div>
+                    <div class="metric-value" id="hl5-afectados">0</div>
+                </div>
+                
+                <!-- TOTAL RBS -->
+                <div class="metric-card total-rbs">
+                    <div class="metric-label">TOTAL RBS</div>
+                    <div class="metric-value" id="total-rbs">0</div>
+                </div>
+                
+                <!-- 3G -->
+                <div class="metric-card tecnologia-3g">
+                    <div class="metric-label">3G</div>
+                    <div class="metric-value" id="total-3g">0</div>
+                </div>
+                
+                <!-- 4G -->
+                <div class="metric-card tecnologia-4g">
+                    <div class="metric-label">4G</div>
+                    <div class="metric-value" id="total-4g">0</div>
+                </div>
+                
+                <!-- B2B -->
+                <div class="metric-card b2b">
+                    <div class="metric-label">B2B</div>
+                    <div class="metric-value" id="total-b2b">0</div>
+                </div>
+            </div>
+            
+            <!-- Sección Principal: Mapa + Gráfico -->
+            <div class="main-section">
+                <!-- Mapa de Afectaciones -->
+                <div class="map-container">
+                    <h3>Mapa de Afectaciones</h3>
+                    <div id="mapa-hl5" class="mapa-hl5"></div>
+                </div>
+                
+                <!-- Histórico de Afectación por Tecnología -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Histórico Afectación x Tecnología</h3>
+                        <div class="chart-filters">
+                            <button class="filter-btn active" data-horas="12">12 Horas</button>
+                            <button class="filter-btn" data-horas="24">24 Horas</button>
+                        </div>
+                    </div>
+                    <canvas id="chart-historico"></canvas>
+                </div>
+            </div>
+            
+            <!-- Panel de Tiempo de Afectación -->
+            <div class="tiempo-afectacion-section">
+                <h3>HL5 por Tiempo de Afectación</h3>
+                <div class="tiempo-afectacion-grid">
+                    <div class="tiempo-card" data-tipo="menor_4h">
+                        <div class="tiempo-label">< 4 Horas</div>
+                        <div class="tiempo-value" id="tiempo-menor-4h">0</div>
+                    </div>
+                    
+                    <div class="tiempo-card" data-tipo="menor_8h">
+                        <div class="tiempo-label">< 8 Horas</div>
+                        <div class="tiempo-value" id="tiempo-menor-8h">0</div>
+                    </div>
+                    
+                    <div class="tiempo-card" data-tipo="menor_24h">
+                        <div class="tiempo-label">< 24 Horas</div>
+                        <div class="tiempo-value" id="tiempo-menor-24h">0</div>
+                    </div>
+                    
+                    <div class="tiempo-card" data-tipo="mayor_1d">
+                        <div class="tiempo-label">> 1 Día</div>
+                        <div class="tiempo-value" id="tiempo-mayor-1d">0</div>
+                    </div>
+                    
+                    <div class="tiempo-card" data-tipo="mayor_2d">
+                        <div class="tiempo-label">> 2 Días</div>
+                        <div class="tiempo-value" id="tiempo-mayor-2d">0</div>
+                    </div>
+                    
+                    <div class="tiempo-card" data-tipo="mayor_3d">
+                        <div class="tiempo-label">> 3 Días</div>
+                        <div class="tiempo-value" id="tiempo-mayor-3d">0</div>
+                    </div>
+                    
+                    <div class="tiempo-card" data-tipo="mayor_4d">
+                        <div class="tiempo-label">> 4 Días</div>
+                        <div class="tiempo-value" id="tiempo-mayor-4d">0</div>
+                    </div>
+                    
+                    <div class="tiempo-card" data-tipo="mayor_5d">
+                        <div class="tiempo-label">> 5 Días</div>
+                        <div class="tiempo-value" id="tiempo-mayor-5d">0</div>
+                    </div>
+                    
+                    <div class="tiempo-card" data-tipo="mayor_6d">
+                        <div class="tiempo-label">> 6 Días</div>
+                        <div class="tiempo-value" id="tiempo-mayor-6d">0</div>
+                    </div>
+                    
+                    <div class="tiempo-card" data-tipo="mayor_7d">
+                        <div class="tiempo-label">> 7 Días</div>
+                        <div class="tiempo-value" id="tiempo-mayor-7d">0</div>
+                    </div>
+                    
+                    <div class="tiempo-card" data-tipo="mayor_15d">
+                        <div class="tiempo-label">> 15 Días</div>
+                        <div class="tiempo-value" id="tiempo-mayor-15d">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detalle HL5 Afectados -->
+            <div class="detalle-section">
+                <div class="detalle-header">
+                    <h3>Detalle HL5 Afectados</h3>
+                    <button id="btn-limpiar-filtros" class="btn-limpiar-filtros">
+                        <ion-icon name="close-circle-outline"></ion-icon>
+                        Limpiar Filtros
+                    </button>
+                </div>
+                <div class="table-wrapper">
+                    <table id="tabla-hl5" class="tabla-hl5">
+                        <thead>
+                            <tr>
+                                <th>
+                                    HORA_INICIO 
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="HORA_INICIO"></ion-icon>
+                                </th>
+                                <th>
+                                    NODE 
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="NODE"></ion-icon>
+                                </th>
+                                <th>
+                                    CINUM 
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="CINUM"></ion-icon>
+                                </th>
+                                <th>
+                                    CINAME 
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="CINAME"></ion-icon>
+                                </th>
+                                <th>
+                                    CIUDAD 
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="CIUDAD"></ion-icon>
+                                </th>
+                                <th>
+                                    DEPARTAMENTO 
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="DEPARTAMENTO"></ion-icon>
+                                </th>
+                                <th>
+                                    3G 
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="3G"></ion-icon>
+                                </th>
+                                <th>
+                                    4G 
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="4G"></ion-icon>
+                                </th>
+                                <th>
+                                    TOTAL_RBS 
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="TOTAL_RB"></ion-icon>
+                                </th>
+                                <th>
+                                    B2B 
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="B2B"></ion-icon>
+                                </th>
+                                <th>
+                                    INC_HL5 
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="INC_HL5"></ion-icon>
+                                </th>
+                                <th>
+                                    INC_MOVIL 
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="INC_MOVIL"></ion-icon>
+                                </th>
+                                <th>
+                                    CEXP 
+                                    <ion-icon name="filter-outline" class="filter-icon" data-col="CEXP"></ion-icon>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-hl5">
+                            <tr>
+                                <td colspan="13" style="text-align: center; padding: 20px;">
+                                    Cargando datos...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Sección de Gráficos por Ubicación -->
+            <div class="graficos-ubicacion-section">
+                <h3>Distribución de HL5 Afectados por Ubicación</h3>
+                <div class="graficos-ubicacion-grid">
+                    <!-- Gráfico por Departamento -->
+                    <div class="grafico-ubicacion-container">
+                        <h4>HL5 por Departamento</h4>
+                        <canvas id="chart-departamentos"></canvas>
+                    </div>
+                    
+                    <!-- Gráfico por Ciudad (Top 10) -->
+                    <div class="grafico-ubicacion-container">
+                        <h4>HL5 por Ciudad (Top 10)</h4>
+                        <canvas id="chart-ciudades"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sección de Gráficos RBS por Ubicación -->
+            <div class="graficos-ubicacion-section">
+                <h3>Distribución de RBS Afectadas por Ubicación</h3>
+                <div class="graficos-ubicacion-grid">
+                    <!-- Gráfico RBS por Departamento -->
+                    <div class="grafico-ubicacion-container">
+                        <h4>RBS por Departamento (3G + 4G)</h4>
+                        <canvas id="chart-rbs-departamentos"></canvas>
+                    </div>
+                    
+                    <!-- Gráfico RBS por Municipio (Top 10) -->
+                    <div class="grafico-ubicacion-container">
+                        <h4>RBS por Municipio (Top 10)</h4>
+                        <canvas id="chart-rbs-municipios"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Histórico Afectación HL5 por Departamento -->
+            <div class="historico-depto-section">
+                <div class="historico-depto-header">
+                    <h3>Histórico Afectación HL5 por Departamento</h3>
+                    <div class="historico-depto-controls">
+                        <div class="depto-select-wrapper">
+                            <ion-icon name="location-outline"></ion-icon>
+                            <select id="select-departamento" class="depto-selector">
+                                <option value="">Todos los Departamentos</option>
+                            </select>
+                        </div>
+                        <div class="chart-filters">
+                            <button class="filter-btn active" data-horas-depto="12">12 Horas</button>
+                            <button class="filter-btn" data-horas-depto="24">24 Horas</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="historico-depto-chart-wrapper">
+                    <div id="historico-depto-loading" class="chart-loading">
+                        <ion-icon name="sync-outline" class="spin"></ion-icon>
+                        Cargando datos...
+                    </div>
+                    <canvas id="chart-historico-depto"></canvas>
+                </div>
+            </div>
+
+            <!-- Histórico Afectación HL5 por Ciudad -->
+            <div class="historico-depto-section">
+                <div class="historico-depto-header">
+                    <h3>Histórico Afectación HL5 por Ciudad</h3>
+                    <div class="historico-depto-controls">
+                        <div class="depto-select-wrapper">
+                            <ion-icon name="business-outline"></ion-icon>
+                            <select id="select-ciudad" class="depto-selector">
+                                <option value="">Todas las Ciudades</option>
+                            </select>
+                        </div>
+                        <div class="chart-filters">
+                            <button class="filter-btn active" data-horas-ciudad="12">12 Horas</button>
+                            <button class="filter-btn" data-horas-ciudad="24">24 Horas</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="historico-depto-chart-wrapper">
+                    <div id="historico-ciudad-loading" class="chart-loading">
+                        <ion-icon name="sync-outline" class="spin"></ion-icon>
+                        Cargando datos...
+                    </div>
+                    <canvas id="chart-historico-ciudad"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Filtro -->
+    <div id="filter-modal" class="filter-modal">
+        <div class="filter-modal-content">
+            <div class="filter-modal-header">
+                <span class="filter-modal-title">Filter by values:</span>
+                <span class="filter-modal-close">&times;</span>
+            </div>
+            <div class="filter-modal-body">
+                <div class="filter-search-box">
+                    <ion-icon name="search-outline"></ion-icon>
+                    <input type="text" id="filter-search-input" placeholder="Filter values">
+                </div>
+                <div class="filter-options-container" id="filter-options-container">
+                    <!-- Las opciones se cargarán dinámicamente aquí -->
+                </div>
+            </div>
+            <div class="filter-modal-footer">
+                <button class="filter-btn-ok" id="filter-btn-ok">Ok</button>
+                <button class="filter-btn-cancel" id="filter-btn-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script src="{{ url_for('static', filename='js/template.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/template_submenu.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/monitoreo_hl5.js') }}"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</body>
+</html>

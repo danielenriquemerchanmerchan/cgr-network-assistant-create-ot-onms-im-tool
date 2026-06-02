@@ -168,6 +168,56 @@ def resolver_coord_pi(departamento: str):
 
 
 # ══════════════════════════════════════════════════════════════════
+# 3b. RESOLVER SIT_LOCATION POR CINUM (inventario_hlx)
+# ══════════════════════════════════════════════════════════════════
+
+def resolver_sit_location(cinum: str):
+    """
+    Busca el SIT_LOCATION (codigo 'S####') de un CI en inventario_hlx.
+
+    Se usa como respaldo para el caso en que Maximo rechaza el cinum
+    original al crear la OT: en ese escenario la OT se reintenta con
+    el cinum generico (ENLTEL_FOGEN), que NO trae ubicacion propia, y
+    hay que pasarle explicitamente esta SIT_LOCATION.
+
+    Por eso esta location se pre-captura ANTES de intentar crear la OT:
+    asi, si Maximo rechaza el CI, ya la tenemos en mano y el reintento
+    es inmediato.
+
+    Parametros:
+        cinum (str): el CI del nodo de despacho. Ej: 'ATL_BQA_VICT_N501'
+
+    Retorna:
+        str con el SIT_LOCATION (ej. 'S6849'), o None si el cinum no
+        esta en inventario_hlx o si su SIT_LOCATION viene vacio.
+    """
+    cinum = (cinum or "").strip()
+    if not cinum:
+        return None
+
+    # Las columnas de inventario_hlx son case-sensitive (creadas con
+    # comillas dobles en mayuscula): hay que referenciarlas entre "".
+    sql = """
+        SELECT "SIT_LOCATION"
+        FROM   onms.inventario_hlx
+        WHERE  "CINUM" = %s
+        LIMIT  1
+    """
+    try:
+        with _abrir_conexion() as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, (cinum,))
+                row = cur.fetchone()
+                if not row:
+                    return None
+                sit_location = (row[0] or "").strip()
+                return sit_location or None
+    except Exception as e:
+        logging.error(f"[catalogos.resolver_sit_location] {e}")
+        return None
+
+
+# ══════════════════════════════════════════════════════════════════
 # 4. BUSCAR PERSONAS (cat_persona_maximo) — para autocomplete
 # ══════════════════════════════════════════════════════════════════
 

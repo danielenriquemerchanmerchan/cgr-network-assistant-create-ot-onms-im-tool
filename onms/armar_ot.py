@@ -25,6 +25,12 @@ STATUS_INICIAL    = "INPRG"
 OWNERGROUP        = "O_GESFO"
 CLASSSTRUCTUREID  = "4213"
 
+# CI generico de respaldo. Se usa cuando Maximo rechaza el cinum
+# original del nodo (CI no registrado). Al ser generico no trae
+# ubicacion propia, por lo que la location debe pasarse aparte
+# (resuelta desde inventario_hlx via catalogos.resolver_sit_location).
+CINUM_GENERICO    = "ENLTEL_FOGEN"
+
 # Specs
 TIPO_TRAMO            = "RBHFO"
 TIPO_OPERACION_FO     = "Red Movil"
@@ -138,6 +144,36 @@ def armar_payload_toplevel(
 
 
 # ══════════════════════════════════════════════════════════════════
+# 3b. ADAPTAR PAYLOAD AL CI GENERICO (fallback)
+# ══════════════════════════════════════════════════════════════════
+
+def adaptar_payload_a_generico(payload_top: dict, sit_location: str) -> dict:
+    """
+    Devuelve una COPIA del payload top-level original, cambiando solo
+    el cinum por el generico (ENLTEL_FOGEN) y la location por la
+    SIT_LOCATION resuelta desde inventario_hlx.
+
+    Todo lo demas (description, ownergroup, classstructureid, lead,
+    reportedby, impacto, etc.) se mantiene identico al payload normal.
+
+    Se usa cuando Maximo rechaza el cinum original: el reintento usa
+    este payload adaptado.
+
+    Parametros:
+        payload_top  (dict): el payload original de armar_payload_toplevel()
+        sit_location (str):  SIT_LOCATION del CI rechazado, resuelta
+                             desde inventario_hlx (ej. 'S6849')
+
+    Retorna:
+        dict nuevo (no muta el original) listo para crear_ot().
+    """
+    payload_generico = dict(payload_top)
+    payload_generico["cinum"]    = CINUM_GENERICO
+    payload_generico["location"] = sit_location
+    return payload_generico
+
+
+# ══════════════════════════════════════════════════════════════════
 # 4. HELPERS PRIVADOS PARA SPECS
 # ══════════════════════════════════════════════════════════════════
 
@@ -210,3 +246,128 @@ def armar_payload_specs(
     ]
 
     return {"spi:workorderspec": specs}
+
+# ══════════════════════════════════════════════════════════════════
+# 4. PAYLOAD DEL INCIDENTE (flujo incidente+OT)
+# ══════════════════════════════════════════════════════════════════
+#
+# Constantes administrativas del incidente. Son las mismas del instructivo
+# de Centro Gestion (test 10_crear_incidente_con_ot.py), centralizadas
+# aqui para que el route no las repita.
+
+# Datos administrativos fijos del incidente
+INC_REPORTEDBY        = "CENTROGESTION"
+INC_ASSETSITEID       = "REDES"
+INC_ASSETORGID        = "MOVISTAR"
+INC_EXTERNALSYSTEM    = "TT_API_CG"
+INC_SEVERIDAD         = 3
+INC_IMPACT            = 4
+INC_SEVERIDAD_DESC    = "MINOR"
+INC_OWNERGROUP        = "O_GESRED"           # heredado por la OT generada
+INC_CLASSIFICATIONID  = "40.05"
+INC_CLASSSTRUCTUREID  = "1887"               # heredado por la OT generada
+INC_DESCRIPTION_LONG  = "Creacion automatica desde SmartSOC ONMS"
+INC_REPLACEMENTSITE   = "REDES"
+
+
+def armar_payload_incidente(datos_despacho: dict, ahora_iso: str) -> dict:
+    """
+    Construye el JSON para POST a RESTINCIDENT.
+
+    Maximo, al recibir este POST, crea el incidente Y genera la OT
+    asociada automaticamente (por config createwomulti).
+
+    Lo que sale del enlace real (datos_despacho):
+        - description: armada con los municipios del anillo
+        - cinum:       cinum_despacho (el CI del lado a despachar)
+        - location:    location_despacho (S###)
+    Lo que es fijo (constantes administrativas arriba):
+        - reportedby, assetsiteid, assetorgid, externalsystem,
+          severidad, impact, ownergroup, classificationid,
+          classstructureid, severidad_description.
+    Lo que se calcula en runtime:
+        - affecteddate, creationdate, affectedstart -> ahora_iso
+
+    Parametros:
+        datos_despacho (dict): resultado de extraer_datos_despacho()
+        ahora_iso      (str):  fecha/hora actual en ISO 8601 con zona,
+                               ej. "2026-05-28T15:30:00-05:00".
+                               El route lo genera con datetime.now().
+
+    Retorna:
+        dict listo para crear_incidente_con_ot().
+    """
+    cinum    = datos_despacho["cinum_despacho"]
+    location = datos_despacho["location_despacho"]
+    description = armar_description(
+        datos_despacho["mun_origen_anillo"],
+        datos_despacho["mun_destino_anillo"],
+    )
+
+    return {
+        "affecteddate":   ahora_iso,
+        "creationdate":   ahora_iso,
+        "affectedstart":  ahora_iso,
+        "description":               description,
+        "description_longdescription": INC_DESCRIPTION_LONG,
+        "reportedby":                INC_REPORTEDBY,
+        "assetsiteid":               INC_ASSETSITEID,
+        "assetorgid":                INC_ASSETORGID,
+        "externalsystem":            INC_EXTERNALSYSTEM,
+        "severidad":                 INC_SEVERIDAD,
+        "impact":                    INC_IMPACT,
+        "severidad_description":     INC_SEVERIDAD_DESC,
+        "cinum":                     cinum,
+        "ownergroup":                INC_OWNERGROUP,
+        "classificationid":          INC_CLASSIFICATIONID,
+        "classstructureid":          INC_CLASSSTRUCTUREID,
+        "multiassetlocci": {
+            "affectedstart":    ahora_iso,
+            "cinum":            cinum,
+            "isprimary":        False,
+            "replacementsite":  INC_REPLACEMENTSITE,
+            "pmchgassesment":   False,
+            "siteid":           INC_ASSETSITEID,
+            "location":         location,
+        },
+    }
+
+
+def adaptar_payload_incidente_a_generico(payload_inc: dict, sit_location: str) -> dict:
+    """
+    Devuelve una COPIA del payload del incidente, cambiando el cinum
+    por el generico (ENLTEL_FOGEN) tanto en la raiz como dentro del
+    multiassetlocci, y reemplazando la location del multiassetlocci
+    por la SIT_LOCATION resuelta desde inventario_hlx.
+
+    Diferencia vs adaptar_payload_a_generico (que es para OT directa):
+        - Aqui hay que tocar dos sitios: cinum raiz + cinum/location
+          dentro de multiassetlocci. La funcion para OT solo cambia
+          las claves raiz.
+
+    Parametros:
+        payload_inc  (dict): payload original de armar_payload_incidente()
+        sit_location (str):  SIT_LOCATION del CI rechazado, de inventario_hlx
+
+    Retorna:
+        dict nuevo (no muta el original) listo para crear_incidente_con_ot().
+    """
+    payload_gen = dict(payload_inc)
+    payload_gen["cinum"] = CINUM_GENERICO
+
+    # multiassetlocci es un dict (objeto, no lista). Lo copiamos y
+    # actualizamos cinum y location.
+    multi_orig = payload_inc.get("multiassetlocci", {})
+    if isinstance(multi_orig, dict):
+        multi_gen = dict(multi_orig)
+        multi_gen["cinum"]    = CINUM_GENERICO
+        multi_gen["location"] = sit_location
+        payload_gen["multiassetlocci"] = multi_gen
+    elif isinstance(multi_orig, list):
+        # Defensivo: si en algun caso viniera como lista, tocamos cada item
+        payload_gen["multiassetlocci"] = [
+            {**item, "cinum": CINUM_GENERICO, "location": sit_location}
+            for item in multi_orig
+        ]
+
+    return payload_gen

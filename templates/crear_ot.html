@@ -73,17 +73,28 @@
             color: #888;
             margin-top: 2px;
         }
+
+        /* Botones del form. El de OT sola en azul (igual que antes).
+           El de incidente+OT en verde oscuro, para diferenciarlo
+           visualmente como variante alternativa. */
+        .botones-acciones {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
         .demo-form button {
-            background: #1a3a5c;
             color: white;
             border: none;
             padding: 10px 22px;
             font-size: 14px;
             border-radius: 4px;
             cursor: pointer;
-            margin-top: 8px;
         }
-        .demo-form button:hover { background: #265084; }
+        .demo-form button.btn-ot      { background: #1a3a5c; }
+        .demo-form button.btn-ot:hover{ background: #265084; }
+        .demo-form button.btn-inc-ot      { background: #2d6a4f; }
+        .demo-form button.btn-inc-ot:hover{ background: #3a8765; }
 
         .demo-resultado {
             margin-top: 24px;
@@ -101,6 +112,96 @@
             font-size: 12px;
             overflow-x: auto;
             margin-top: 8px;
+        }
+
+        /* Aviso destacado cuando se uso el CI generico. Amarillo
+           para que el usuario note que no se uso el CI original. */
+        .demo-aviso-generico {
+            background: #fff3cd;
+            border-left: 4px solid #f0ad4e;
+            color: #5c3a00;
+            padding: 10px 14px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        .demo-aviso-generico strong { color: #5c3a00; }
+
+        /* ─────────── Overlay de progreso ───────────
+           Aparece encima del form mientras el backend trabaja.
+           No es progreso "real": el cliente simula etapas con tiempos
+           estimados basados en lo que sabemos del backend. Si el server
+           tarda mas que la suma de etapas, la ultima ("Casi listo...")
+           se queda fija hasta que llega la respuesta. */
+        .progreso-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 58, 92, 0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(2px);
+        }
+        .progreso-overlay.activo { display: flex; }
+
+        .progreso-card {
+            background: white;
+            border-radius: 8px;
+            padding: 28px 36px;
+            min-width: 360px;
+            max-width: 92vw;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .progreso-card h3 {
+            margin: 0 0 6px 0;
+            font-size: 16px;
+            color: #1a3a5c;
+        }
+        .progreso-card .progreso-etapa {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 16px;
+            min-height: 20px;
+        }
+        .progreso-barra {
+            background: #e7eaf0;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .progreso-barra-fill {
+            background: linear-gradient(90deg, #2d6a4f 0%, #40916c 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 600ms ease-out;
+        }
+        .progreso-pct {
+            font-size: 12px;
+            color: #888;
+            text-align: right;
+        }
+        .progreso-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #d0d7de;
+            border-top-color: #2d6a4f;
+            border-radius: 50%;
+            animation: progreso-girar 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes progreso-girar {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Botones deshabilitados durante el envio */
+        .demo-form button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -311,13 +412,13 @@
     <main>
         <div class="demo-wrap">
             <div class="demo-banner">
-                <strong>Demo funcional —</strong> esta página solo demuestra que el backend de creación de OTs RBHFO funciona end-to-end (Postgres → armado → Maximo). El frontend definitivo lo integrará el equipo de UI dentro de <code>onms.html</code>.
+                <strong>Demo funcional —</strong> esta página demuestra dos flujos del backend: creación de OT directa y creación de incidente+OT (con actualización en 3 fases). Ambos flujos comparten el mismo formulario.
             </div>
 
             <h1>Crear OT RBHFO</h1>
-            <p class="demo-sub">Falla de Fibra Óptica en tramo BHFO. Crea la OT en Maximo con sus 15 specs.</p>
+            <p class="demo-sub">Falla de Fibra Óptica en tramo BHFO. Elegí qué flujo ejecutar con los botones de abajo.</p>
 
-            <form class="demo-form" method="POST" action="{{ url_for('onms_crear_ot_get') }}">
+            <form id="form-crear-ot" class="demo-form" method="POST" action="{{ url_for('onms_crear_ot_get') }}">
                 <fieldset>
                     <legend>Enlace afectado</legend>
 
@@ -354,16 +455,47 @@
                            placeholder="Ej: NOC">
                 </fieldset>
 
-                <button type="submit">Crear OT en Maximo</button>
+                <!-- Input hidden que lleva el valor de 'accion' al backend.
+                     Se actualiza en el click de cada boton ANTES del submit.
+                     Mas robusto que confiar en e.submitter / form data del
+                     submit button, porque algunos browsers no lo populan en
+                     ciertos escenarios (re-submit, JS programatico, etc.). -->
+                <input type="hidden" id="accion-real" name="accion" value="solo_ot">
+
+                <!-- Dos botones en el mismo form. El backend distingue
+                     por el input hidden 'accion'. Quitamos name="accion" de
+                     los botones para que solo el hidden viaje al backend. -->
+                <div class="botones-acciones">
+                    <button type="submit" class="btn-ot" data-accion="solo_ot">
+                        Crear OT en Maximo
+                    </button>
+                    <button type="submit" class="btn-inc-ot" data-accion="incidente_ot">
+                        Crear incidente + OT
+                    </button>
+                </div>
+                <div class="hint" style="margin-top: 10px;">
+                    <strong>OT directa:</strong> crea solo la OT (flujo validado).<br>
+                    <strong>Incidente + OT:</strong> crea un incidente en Maximo que genera la OT automáticamente; luego la OT se completa en 3 fases (estructural / dependiente / specs).
+                </div>
             </form>
 
             {% if resultado %}
                 {% if resultado.ok %}
                 <div class="demo-resultado ok">
-                    <strong>✓ OT creada correctamente.</strong><br>
+                    <strong>✓ Creación exitosa.</strong><br>
+                    {% if resultado.ticket %}
+                    <strong>incidente (ticket):</strong> {{ resultado.ticket }}<br>
+                    {% endif %}
                     <strong>wonum:</strong> {{ resultado.wonum }}<br>
                     <strong>description:</strong> {{ resultado.description }}<br>
                     <strong>specs cargadas:</strong> {{ resultado.specs_count }}
+
+                    {% if resultado.aviso %}
+                    <div class="demo-aviso-generico">
+                        <strong>⚠ Aviso:</strong> {{ resultado.aviso }}
+                    </div>
+                    {% endif %}
+
                     {% if resultado.detalle %}
                     <pre>{{ resultado.detalle }}</pre>
                     {% endif %}
@@ -379,6 +511,123 @@
             {% endif %}
         </div>
     </main>
+
+    <!-- ===== OVERLAY DE PROGRESO (simulado por etapas) =====
+         Aparece sobre el form cuando se hace submit. No es progreso
+         real: el cliente avanza con tiempos estimados basados en lo
+         que sabemos del backend. Si el server tarda mas, se queda
+         en la ultima etapa hasta que llega la respuesta. -->
+    <div id="progreso-overlay" class="progreso-overlay" aria-hidden="true">
+        <div class="progreso-card" role="status" aria-live="polite">
+            <h3 id="progreso-titulo">Procesando...</h3>
+            <div id="progreso-etapa" class="progreso-etapa">
+                <span class="progreso-spinner"></span>
+                <span id="progreso-texto">Iniciando...</span>
+            </div>
+            <div class="progreso-barra">
+                <div id="progreso-fill" class="progreso-barra-fill"></div>
+            </div>
+            <div id="progreso-pct" class="progreso-pct">0%</div>
+        </div>
+    </div>
+
+    <!-- ===== JS de progreso simulado ===== -->
+    <script>
+        (function() {
+            const form = document.getElementById("form-crear-ot");
+            if (!form) return;
+
+            // Secuencias de etapas por flujo. Cada item es [delay_ms, texto, pct].
+            // Los tiempos son ESTIMADOS segun lo observado en logs reales:
+            //   - "OT sola" toma ~2-3s en total (3 llamadas a Maximo)
+            //   - "Incidente+OT" toma ~6-10s (6 llamadas + busqueda relaciones)
+            // Si el server tarda mas, la ultima etapa se queda fija ("Casi
+            // listo...") hasta que llegue la respuesta. No miente: solo deja
+            // de avanzar.
+            const ETAPAS_SOLO_OT = [
+                [0,    "Resolviendo enlace en inventario...",     10],
+                [600,  "Consultando catalogo de coordinadores...", 25],
+                [1200, "Verificando respaldo del CI...",           40],
+                [1700, "Creando OT en Maximo...",                  60],
+                [2700, "Cargando especificaciones...",             85],
+                [3500, "Casi listo...",                            95],
+            ];
+            const ETAPAS_INC_OT = [
+                [0,    "Resolviendo enlace en inventario...",     5],
+                [700,  "Consultando catalogo de coordinadores...", 12],
+                [1400, "Verificando respaldo del CI...",          18],
+                [2000, "Creando incidente en Maximo...",          30],
+                [3500, "Localizando la OT generada...",           45],
+                [4500, "Actualizando OT (fase 1/3: estructural)...", 58],
+                [5800, "Actualizando OT (fase 2/3: datos operativos)...", 72],
+                [7100, "Cargando especificaciones (fase 3/3)...", 85],
+                [8400, "Casi listo...",                           95],
+            ];
+
+            const overlay     = document.getElementById("progreso-overlay");
+            const titulo      = document.getElementById("progreso-titulo");
+            const texto       = document.getElementById("progreso-texto");
+            const fill        = document.getElementById("progreso-fill");
+            const pct         = document.getElementById("progreso-pct");
+            const inputAccion = document.getElementById("accion-real");
+
+            let timers = [];
+
+            // ── Click en cualquier boton submit ──
+            // Antes de que el form haga submit, copiamos el data-accion del
+            // boton clickeado al input hidden. Asi garantizamos que el
+            // backend siempre reciba 'accion' con el valor correcto,
+            // independiente de como el browser interprete e.submitter.
+            const botones = form.querySelectorAll("button[type=submit]");
+            botones.forEach(function(btn) {
+                btn.addEventListener("click", function() {
+                    inputAccion.value = btn.dataset.accion || "solo_ot";
+                });
+            });
+
+            function arrancarProgreso(esIncidente) {
+                titulo.textContent = esIncidente
+                    ? "Creando incidente + OT en Maximo..."
+                    : "Creando OT en Maximo...";
+                texto.textContent = "Iniciando...";
+                fill.style.width  = "0%";
+                pct.textContent   = "0%";
+                overlay.classList.add("activo");
+                overlay.setAttribute("aria-hidden", "false");
+
+                const etapas = esIncidente ? ETAPAS_INC_OT : ETAPAS_SOLO_OT;
+                for (const [delay, msg, porcent] of etapas) {
+                    const t = setTimeout(function() {
+                        texto.textContent = msg;
+                        fill.style.width  = porcent + "%";
+                        pct.textContent   = porcent + "%";
+                    }, delay);
+                    timers.push(t);
+                }
+            }
+
+            // Deshabilitar botones cuando se inicia el submit, evita
+            // que el usuario haga doble-click y termine creando dos
+            // incidentes por accidente.
+            function deshabilitarBotones() {
+                botones.forEach(function(b) { b.disabled = true; });
+            }
+
+            form.addEventListener("submit", function(e) {
+                // El input hidden ya tiene el valor correcto (lo seteo
+                // el listener de click). Lo leemos para saber que overlay
+                // mostrar.
+                const accion = inputAccion.value || "solo_ot";
+                const esIncidente = (accion === "incidente_ot");
+
+                deshabilitarBotones();
+                arrancarProgreso(esIncidente);
+                // El form continua su submit normal; cuando el server
+                // responde y recarga la pagina, el overlay desaparece
+                // junto con el DOM viejo.
+            });
+        })();
+    </script>
 
     <!-- Scripts (mismos que onms.html para que sidebar e ionicons anden) -->
     <script src="{{ url_for('static', filename='js/template.js') }}"></script>

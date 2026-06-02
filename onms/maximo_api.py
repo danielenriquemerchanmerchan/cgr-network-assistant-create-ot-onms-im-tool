@@ -47,8 +47,9 @@ MAXIMO_PASSWORD: str = _requerir_env("MAXIMO_PASSWORD")
 MAXIMO_TIMEOUT:  int = int(os.getenv("MAXIMO_TIMEOUT", "30"))
 
 # URLs derivadas
-URL_BASE:   str = f"{MAXIMO_BASE_URL}/RESTWO"
-LOGOUT_URL: str = MAXIMO_BASE_URL.replace("/oslc/os", "/oslc/logout")
+URL_BASE:     str = f"{MAXIMO_BASE_URL}/RESTWO"
+URL_INCIDENT: str = f"{MAXIMO_BASE_URL}/RESTINCIDENT"
+LOGOUT_URL:   str = MAXIMO_BASE_URL.replace("/oslc/os", "/oslc/logout")
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -234,3 +235,193 @@ def actualizar_ot(href, datos):
     finally:
         if r is not None:
             _cerrar_sesion(r)
+
+
+# ══════════════════════════════════════════════════════════════════
+# 3. CREAR INCIDENTE (+ OT automatica)
+# ══════════════════════════════════════════════════════════════════
+#
+# Un unico POST a RESTINCIDENT crea el incidente Y, por configuracion
+# de Maximo (createwomulti), genera la OT asociada en la misma operacion.
+#
+# Nosotros solo enviamos el JSON del incidente; Maximo se encarga
+# de crear y vincular la OT.
+#
+# La OT nace heredando del incidente: classstructureid=1887 y
+# ownergroup=O_GESRED. Para dejarla con los datos de fibra
+# (classstructureid=4213, O_GESFO, specs, etc.) hay que actualizarla
+# despues con actualizar_ot() en 3 fases (estructural / dependiente /
+# specs); el orquestador del route se encarga de eso.
+
+def crear_incidente_con_ot(datos):
+    """
+    Crea un incidente en Maximo (objeto RESTINCIDENT) y dispara la
+    generacion automatica de la OT asociada.
+
+    Parametros:
+        datos (dict): payload del incidente. Campos minimos:
+            description, reportedby, assetsiteid, assetorgid,
+            externalsystem, severidad, impact, cinum, ownergroup,
+            classificationid, classstructureid, affectedstart,
+            multiassetlocci (objeto o lista con el CI afectado)
+
+    Retorna dict:
+        success    (bool)
+        message    (str)
+        status     (str)  'success' | 'http_error' | 'exception'
+        ticket     (str)  ticketid del incidente, o None si fallo
+        wonum      (str)  wonum de la OT si Maximo lo devuelve en el response.
+                          Puede venir vacio: si es asi, consultar con
+                          obtener_wonum_de_incidente(ticketid).
+        href       (str)  Location header del incidente
+        raw        (dict) response completo de Maximo
+    """
+    r = None
+    try:
+        r = requests.post(
+            f"{URL_INCIDENT}?lean=1",
+            auth=HTTPBasicAuth(MAXIMO_USER, MAXIMO_PASSWORD),
+            headers={
+                "Content-Type": "application/json",
+                "properties":   "*",
+            },
+            json=datos,
+            timeout=MAXIMO_TIMEOUT,
+        )
+
+        if r.status_code in (200, 201):
+            data = r.json()
+            ticketid = data.get("spi:ticketid") or data.get("ticketid", "")
+            wonum    = data.get("spi:wonum")    or data.get("wonum", "")
+            href     = r.headers.get("Location", "")
+
+            logging.info(
+                f"Incidente creado: ticketid={ticketid}"
+                + (f", wonum={wonum}" if wonum else " (wonum NO en response)")
+            )
+            return {
+                "success": True,
+                "message": f"Incidente {ticketid} creado correctamente",
+                "status":  "success",
+                "ticket":  ticketid,
+                "wonum":   wonum,
+                "href":    href,
+                "raw":     data,
+            }
+        else:
+            logging.error(
+                f"Error creando incidente HTTP {r.status_code}: {r.text[:500]}"
+            )
+            return {
+                "success": False,
+                "message": f"Error HTTP {r.status_code}: {r.text[:200]}",
+                "status":  "http_error",
+                "ticket":  None,
+                "wonum":   None,
+                "href":    "",
+                "raw":     None,
+            }
+
+    except Exception as e:
+        logging.error(f"Error creando incidente: {e}")
+        return {
+            "success": False,
+            "message": str(e),
+            "status":  "exception",
+            "ticket":  None,
+            "wonum":   None,
+            "href":    "",
+            "raw":     None,
+        }
+
+    finally:
+        if r is not None:
+            _cerrar_sesion(r)
+
+
+# ══════════════════════════════════════════════════════════════════
+# 4. RELACIONES DE INCIDENTE (para obtener el wonum de la OT generada)
+# ══════════════════════════════════════════════════════════════════
+#
+# Cuando crear_incidente_con_ot() no devuelve el wonum en el response
+# inmediato (caso comun en algunas versiones de Maximo), hay que ir a
+# buscarlo. Las relaciones del incidente se exponen como subrecurso:
+#     GET {href_incidente}/relatedrecord
+# Los miembros incluyen tanto incidentes como work orders mezclados;
+# filtramos por relatedrecclass="WORKORDER" para encontrar la OT
+# generada (suele venir con relatetype="FOLLOWUP").
+
+def listar_relaciones_incidente(ticketid):
+    """
+    Devuelve las relaciones (otros incidentes y OTs) de un incidente.
+
+    Retorna dict:
+        success      (bool)
+        message      (str)
+        relacionados (list[dict])
+    """
+    r1 = None
+    r2 = None
+    try:
+        r1 = requests.get(
+            f'{URL_INCIDENT}/?lean=1'
+            f'&oslc.where=ticketid="{ticketid}"'
+            f'&oslc.select=ticketid,href',
+            auth=HTTPBasicAuth(MAXIMO_USER, MAXIMO_PASSWORD),
+            timeout=MAXIMO_TIMEOUT,
+        )
+        if r1.status_code != 200:
+            return {"success": False,
+                    "message": f"Error HTTP {r1.status_code} buscando ticket",
+                    "relacionados": []}
+        members = r1.json().get("rdfs:member") or r1.json().get("member")
+        if not members:
+            return {"success": False,
+                    "message": f"Ticket {ticketid} no encontrado",
+                    "relacionados": []}
+        href_inc = members[0].get("href", "")
+        if not href_inc:
+            return {"success": False,
+                    "message": "Sin href en el ticket",
+                    "relacionados": []}
+
+        r2 = requests.get(
+            f"{href_inc}/relatedrecord",
+            params={"lean": "1", "oslc.select": "*"},
+            auth=HTTPBasicAuth(MAXIMO_USER, MAXIMO_PASSWORD),
+            timeout=MAXIMO_TIMEOUT,
+        )
+        if r2.status_code != 200:
+            return {"success": False,
+                    "message": f"Error HTTP {r2.status_code} en /relatedrecord",
+                    "relacionados": []}
+        data = r2.json()
+        miembros = data.get("rdfs:member") or data.get("member") or []
+        return {"success": True,
+                "message": f"{len(miembros)} relacion(es)",
+                "relacionados": list(miembros)}
+
+    except Exception as e:
+        logging.error(f"Error listando relaciones de ticket {ticketid}: {e}")
+        return {"success": False, "message": str(e), "relacionados": []}
+
+    finally:
+        if r1 is not None:
+            _cerrar_sesion(r1)
+        if r2 is not None:
+            _cerrar_sesion(r2)
+
+
+def obtener_wonum_de_incidente(ticketid):
+    """
+    Filtra las relaciones del incidente y devuelve el wonum de la OT
+    generada (relatedrecclass='WORKORDER'). Retorna None si no hay.
+    """
+    info = listar_relaciones_incidente(ticketid)
+    if not info["success"]:
+        return None
+    for rel in info["relacionados"]:
+        clase = (rel.get("relatedrecclass") or "").upper()
+        if clase == "WORKORDER":
+            return rel.get("relatedreckey")
+    return None
